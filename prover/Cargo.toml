@@ -1,3 +1,6 @@
+# Standalone workspace — keep the halo2 dep tree separate from the root Anchor workspace.
+[workspace]
+
 [package]
 name = "pruvdrop-prover"
 version = "0.1.0"
