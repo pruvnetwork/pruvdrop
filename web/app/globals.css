@@ -1,5 +1,22 @@
 :root {
-  /* pruvpot palette */
+  /* LIGHT (default, pruvpot light) */
+  --bg: #f7f9ff;
+  --surface: #ffffff;
+  --surface-2: #f8faff;
+  --surface-3: #f3f5ff;
+  --line: #94a3b821;
+  --line-2: #7c3aed1f;
+  --fg: #111827;
+  --muted: #475569;
+  --faint: #7d879c;
+  --accent: #2563eb;
+  --accent-2: #7c3aed;
+  --good: #009767;
+  --warn: #b75000;
+  --bad: #dc2626;
+}
+[data-theme="dark"] {
+  /* DARK (pruvpot dark) */
   --bg: #070a14;
   --surface: #0d1220;
   --surface-2: #11182a;
@@ -51,7 +68,7 @@ button:hover { filter: brightness(1.08); }
 button:disabled { opacity: .5; cursor: not-allowed; filter: none; }
 button.secondary { background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
 input {
-  width: 100%; border: 1px solid var(--line); background: #0a0f1c; color: var(--fg);
+  width: 100%; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg);
   border-radius: 10px; padding: 12px; font-size: 14px;
 }
 input:focus { outline: none; border-color: var(--accent); }
@@ -104,3 +121,27 @@ input:focus { outline: none; border-color: var(--accent); }
 .note { color: var(--faint); font-size: 12.5px; margin-top: 14px; line-height: 1.6; }
 .center { text-align: center; }
 .back { color: var(--muted); font-size: 13px; }
+
+/* theme toggle */
+.theme-toggle {
+  position: fixed; top: 16px; right: 16px; z-index: 50;
+  width: 38px; height: 38px; padding: 0; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--fg);
+  font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.theme-toggle:hover { filter: none; border-color: var(--accent-2); }
+
+/* leaderboard */
+.lb { width: 100%; border-collapse: collapse; }
+.lb th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 700; padding: 0 8px 10px; }
+.lb th.num, .lb td.num { text-align: right; }
+.lb td { padding: 12px 8px; border-top: 1px solid var(--line); font-size: 14px; }
+.lb tr:hover td { background: var(--surface-2); }
+.lb .rank { color: var(--faint); font-weight: 700; width: 36px; }
+.lb .who { font-weight: 600; }
+.lb .who a { color: var(--fg); }
+.lb .who a:hover { color: var(--accent); }
+.lb .top1 .rank { color: #f5b301; }
+.lb .top2 .rank { color: #b9c2d0; }
+.lb .top3 .rank { color: #cd7f32; }
+.lb .score { color: var(--accent); font-weight: 700; }

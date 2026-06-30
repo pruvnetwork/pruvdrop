@@ -22,7 +22,8 @@ export default function Home() {
         </div>
         <div className="cta">
           <a className="primary" href="/submit">Submit your tweet</a>
-          <a className="ghost" href="/claim">Claim your airdrop</a>
+          <a className="ghost" href="/leaderboard">Leaderboard</a>
+          <a className="ghost" href="/claim">Claim</a>
         </div>
       </div>
 
