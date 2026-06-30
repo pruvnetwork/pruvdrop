@@ -166,6 +166,18 @@ then weighted-lottery mode, then recursion for large M.
 
 ## 7. Honest caveats
 
+- **⚠️ PRUV's `PoseidonChip` is currently unsound (must fix before any soundness claim).**
+  `PoseidonChip::configure` allocates `in_a/in_b/out` advice columns with equality but
+  **no gate enforcing `out == Poseidon(in_a, in_b)`** — the hash output is assigned as a
+  *free* witness (the native value). So `merkle`, `governance_vote`, and therefore the
+  **Phase-1 inclusion proof** are only sound for an *honest* prover; a malicious prover can
+  forge hash steps (e.g. fake an inclusion). The real S-box gate (`SboxChip`) exists but is
+  not wired into a full Poseidon permutation. **Fix:** build a sound Poseidon-128 gadget
+  (SboxChip + MDS, full/partial rounds) in pruv-circuits, then the Poseidon-Merkle binding
+  replaces the spike's RLC fingerprint. Until then, do not claim malicious-prover soundness.
+- **Phase-2 spike binding is RLC, not Merkle.** `prover/src/topn.rs` binds scores to a
+  public fingerprint `C = Σ scoreᵢ·rⁱ` (soundly constrained with our own gates) because the
+  Poseidon gadget above isn't sound yet. Production swaps this for the Poseidon-Merkle root.
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we
   already commit — say exactly that, not "provably-fair-by-ZK".
 - **Prover scale.** Set-size-linear prover; very large campaigns need the chunk+recurse path.
