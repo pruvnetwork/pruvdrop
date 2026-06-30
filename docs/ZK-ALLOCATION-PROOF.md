@@ -178,10 +178,12 @@ then weighted-lottery mode, then recursion for large M.
   exact width-3 constants, it matches `hash_two`, and a wrong output is rejected (1344 B,
   k=11). The Poseidon gadget is chained into a **sound in-circuit Merkle inclusion** in
   `prover/src/merkle.rs` (`--merkle-gadget`): levels linked by copy constraints, `leaf ∈ root`
-  proven, wrong leaf rejected (depth-4 demo, 1536 B, k=12). **Next:** combine it with the
-  top-N circuit (replace the RLC fingerprint with this Poseidon-Merkle `inputRoot` binding)
-  and upstream the gadget into pruv-circuits to fix `merkle`/`governance`/Phase-1 at the
-  protocol level.
+  proven, wrong leaf rejected (depth-4 demo, 1536 B, k=12). **Upstreamed:** the sound
+  permutation now lives in the protocol repo as `pruv-circuits::poseidon_sound`
+  (`circuits/tests/test_poseidon_sound.rs` passes: native == `hash_two`, prove/verify binds the
+  output, a wrong output is rejected). **Remaining there:** wire it into pruv's `merkle` /
+  `governance` circuits (replace their unconstrained `PoseidonConfig` hash rows) to make
+  `merkle`/`governance`/Phase-1 sound at the protocol level.
 - **Sound counting over a committed set — built.** `prover/src/combined.rs` (`--combined`)
   binds the scores to a sound **Poseidon-chain** commitment `C` (each step the constrained
   permutation, score cells shared with the comparator by copy constraints) and proves exactly
