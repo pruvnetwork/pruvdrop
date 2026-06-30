@@ -39,7 +39,8 @@ a real 33-author Farcaster snapshot.)
 ```
 programs/viral-airdrop-claim/   Anchor program: initialize, commit_snapshot, claim (+ nullifier)
 app/src/                        TS pipeline (ingest → score → snapshot → allocate → claim tree)
-app/portal/                     static claim portal (Phantom)
+app/portal/                     static claim portal (lightweight, Phantom)
+web/                            Next.js app: /claim, /submit, /api/validate (deployable frontend)
 tests/                          on-chain integration test
 ```
 
@@ -125,12 +126,24 @@ resistance is weaker than Farcaster (no quality score). A tweet with the ticker
 Solana address to qualify"). Use X for reach (e.g. an X-native influencer's
 audience); use Farcaster for the cleanest data + sybil resistance.
 
-**Instant-validation submit form** (`app/submit/` + `app/api/validate.js`): an
-optional static form where casters paste their tweet link and get instant
+**Instant-validation submit form**: casters paste their tweet link and get instant
 feedback ("you qualify" / "add your Solana address"). It validates server-side
 (the syndication endpoint blocks browser CORS) and collects valid entries via a
-configurable webhook. Deploy the `app/` directory on Vercel to serve `/submit`,
-`/api/validate`, and `/portal` together. See `app/submit/README.md`.
+configurable webhook.
+
+## Frontend — two options
+
+- **`web/` (Next.js, recommended):** React + TypeScript app with `/claim`, `/submit`,
+  and the `/api/validate` route. Build-verified. **Deploy on Vercel with Root
+  Directory `web`** (Framework: Next.js, auto-detected). Config lives in
+  `web/public/config.json`, `claims.json`, `submit-config.json`.
+  ```bash
+  cd web && npm install && npm run build   # or just push — Vercel builds it
+  ```
+- **`app/portal/` + `app/api/validate.js` (lightweight static):** plain HTML/JS +
+  one serverless function. Deploy with Root Directory `app`. No build step.
+
+Both talk to the same on-chain program; pick one to deploy.
 
 ## Fairness
 
