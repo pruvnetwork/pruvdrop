@@ -100,6 +100,31 @@ This turns the exclusion into an opt-in and nudges casters to verify a Solana
 wallet (an ecosystem win). Communicate it in the campaign:
 *"verify your Solana wallet on Farcaster to qualify."*
 
+## Platform: Farcaster (auto-scan) or X (claim-based)
+
+Only Layer 1 is platform-specific; the rest is platform-agnostic.
+
+- **Farcaster** (`run-campaign`): auto-scans casts via Neynar; free wallet mapping
+  (verified addresses); best sybil resistance. Reaches the crypto-Farcaster crowd.
+- **X / Twitter** (`run-campaign-x`): **claim-based, wallet-in-tweet**, no paid API.
+  Casters tweet about the ticker AND include their Solana address in the tweet;
+  the tweet URL/id is submitted; we read each via the free syndication endpoint
+  and extract the ticker, engagement, and the embedded address. The address is in
+  the tweet, so the binding is **trustless** (only the author can author it) — no
+  OAuth or relayer needed.
+
+```bash
+# X campaign: tweets.json (URLs/ids) + campaign-x.json (query = ticker, minQualityScore 0)
+npm run campaign:x -- ./tweets.json ./campaign-x.json   # -> out/snapshot.json + pending.json
+```
+
+X caveats: the syndication endpoint is unofficial — likes are reliable, but
+retweet/reply counts and follower counts may be absent (treated as 0); sybil
+resistance is weaker than Farcaster (no quality score). A tweet with the ticker
++ engagement but no Solana address becomes `pending` ("repost including your
+Solana address to qualify"). Use X for reach (e.g. an X-native influencer's
+audience); use Farcaster for the cleanest data + sybil resistance.
+
 ## Fairness
 
 - **Allocation**: zero operator trust — deterministic from the committed snapshot

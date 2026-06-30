@@ -6,13 +6,15 @@
   "description": "Farcaster-first verifiable viral airdrop — ingestion, scoring, snapshot, allocation, claim tree, portal.",
   "scripts": {
     "campaign": "tsx src/run-campaign.ts",
+    "campaign:x": "tsx src/run-campaign-x.ts",
     "allocate": "tsx src/run-allocate.ts",
     "claimtree": "tsx src/run-claimtree.ts",
     "portal": "tsx src/run-portal.ts",
     "demo": "tsx src/demo-full.ts",
     "selftest": "tsx src/selftest.ts",
     "selftest:alloc": "tsx src/selftest-allocate.ts",
-    "selftest:claim": "tsx src/selftest-claim.ts"
+    "selftest:claim": "tsx src/selftest-claim.ts",
+    "selftest:x": "tsx src/selftest-x.ts"
   },
   "engines": { "node": ">=18.0.0" },
   "dependencies": {
