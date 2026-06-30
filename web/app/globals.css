@@ -43,7 +43,7 @@ body {
   min-height: 100vh;
 }
 a { color: var(--accent); text-decoration: none; }
-.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.wrap { min-height: calc(100vh - 61px); display: flex; align-items: center; justify-content: center; padding: 24px; }
 .card {
   width: 100%; max-width: 480px;
   background: var(--surface);
@@ -122,12 +122,34 @@ input:focus { outline: none; border-color: var(--accent); }
 .center { text-align: center; }
 .back { color: var(--muted); font-size: 13px; }
 
-/* theme toggle */
+/* header */
+.hdr {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 16px;
+  height: 60px; padding: 0 18px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.hdr-brand { display: flex; align-items: center; gap: 9px; color: var(--fg); }
+.hdr-brand img { display: block; }
+.hdr-name { font-weight: 800; letter-spacing: -0.01em; font-size: 16px; }
+.hdr-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line-2); color: var(--muted); }
+.hdr-nav { display: flex; gap: 4px; margin: 0 auto; }
+.hdr-nav a { padding: 7px 14px; border-radius: 8px; color: var(--muted); font-weight: 500; font-size: 14px; }
+.hdr-nav a:hover { color: var(--fg); }
+.hdr-nav a.active { color: var(--fg); background: var(--surface-2); border: 1px solid var(--line-2); }
+.hdr-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.hdr-nav + .hdr-right { margin-left: 0; }
+.hdr-connect { padding: 8px 16px; border-radius: 9px; font-weight: 600; font-size: 14px; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.hdr-connect:hover { filter: brightness(1.08); }
+@media (max-width: 720px) { .hdr-nav { display: none; } }
+
+/* theme toggle (header icon) */
 .theme-toggle {
-  position: fixed; top: 16px; right: 16px; z-index: 50;
-  width: 38px; height: 38px; padding: 0; border-radius: 10px;
+  width: 36px; height: 36px; padding: 0; border-radius: 9px;
   background: var(--surface-2); border: 1px solid var(--line); color: var(--fg);
-  font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center;
 }
 .theme-toggle:hover { filter: none; border-color: var(--accent-2); }
 
