@@ -2,15 +2,20 @@
 import { useEffect, useState } from "react";
 
 interface Cfg { programId: string; rpcUrl: string; mint: string; claimRoot: string; }
+interface Proof { scheme: string; proof_hash: string; poseidon_root: string; proof_b64: string; wallet?: string; index?: number; }
 
 export default function Verify() {
   const [cfg, setCfg] = useState<Cfg | null>(null);
   const [count, setCount] = useState<number | null>(null);
+  const [proof, setProof] = useState<Proof | null>(null);
 
   useEffect(() => {
     fetch("/config.json").then((r) => r.json()).then(setCfg).catch(() => {});
     fetch("/claims.json").then((r) => r.json()).then((c) => setCount(Object.keys(c).length)).catch(() => {});
+    fetch("/allocation-proof.json").then((r) => (r.ok ? r.json() : null)).then(setProof).catch(() => {});
   }, []);
+
+  const proofBytes = proof?.proof_b64 ? Math.floor((proof.proof_b64.length * 3) / 4) : 0;
 
   const cluster = cfg?.rpcUrl.includes("devnet") ? "?cluster=devnet" : "";
   const ex = (a: string) => `https://explorer.solana.com/address/${a}${cluster}`;
@@ -54,6 +59,25 @@ export default function Verify() {
           </div>
         </div>
       </div>
+
+      {proof && (
+        <div className="section">
+          <h2>Zero-knowledge proof <span className="zkbadge">Phase 1</span></h2>
+          <div className="panel">
+            <div className="kv"><span className="k">Scheme</span><span className="v mono">{proof.scheme}</span></div>
+            <div className="kv"><span className="k">Poseidon root</span><span className="v mono">{proof.poseidon_root}</span></div>
+            <div className="kv"><span className="k">Proof hash (attested on-chain)</span><span className="v mono">{proof.proof_hash}</span></div>
+            <div className="kv"><span className="k">Proof</span><span className="v"><a href="/allocation-proof.bin" target="_blank">allocation-proof.bin ↗</a> · {proofBytes} B</span></div>
+            <div className="note">
+              A <b>real</b> Halo2 KZG/BN254 proof from <a href="https://github.com/pruvnetwork/pruvdrop/tree/main/prover" target="_blank">PRUV&apos;s circuits</a>:
+              it proves a winner&apos;s leaf is in the committed Poseidon tree. <b>Phase 1</b> proves
+              inclusion; the full allocation-correctness proof (the whole draw, without recomputing)
+              is <b>Phase 2</b>. This sample uses a dev SRS over a sample allocation — production uses
+              a real powers-of-tau and the live winners. See <a href="https://github.com/pruvnetwork/pruvdrop/blob/main/docs/ZK-ALLOCATION-PROOF.md" target="_blank">the plan ↗</a>.
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="section">
         <h2>Recompute it yourself</h2>
