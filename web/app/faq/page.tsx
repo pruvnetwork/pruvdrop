@@ -9,7 +9,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "How are winners chosen?",
-    a: <>By a virality score from public engagement (likes, reposts, replies). It is deterministic — the same public posts and the same published rules always produce the same winners. No operator discretion.</>,
+    a: <>By a virality score from public engagement (likes, reposts, replies). It is deterministic - the same public posts and the same published rules always produce the same winners. No operator discretion.</>,
   },
   {
     q: "Is it really fair?",
@@ -17,11 +17,11 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Why put my wallet in the tweet?",
-    a: <>So the reward is bound to you trustlessly — only you can author your own tweet, so the address inside it is provably yours. No login, no KYC, no insider mapping.</>,
+    a: <>So the reward is bound to you trustlessly - only you can author your own tweet, so the address inside it is provably yours. No login, no KYC, no insider mapping.</>,
   },
   {
     q: "When is the draw, and how do I claim?",
-    a: <>See the live countdown on the <a href="/">home page</a>. After the draw, claiming opens on the <a href="/claim">Claim</a> page — connect the wallet you used. Each wallet can claim once (enforced on-chain).</>,
+    a: <>See the live countdown on the <a href="/">home page</a>. After the draw, claiming opens on the <a href="/claim">Claim</a> page - connect the wallet you used. Each wallet can claim once (enforced on-chain).</>,
   },
   {
     q: "What about bots and sybils?",

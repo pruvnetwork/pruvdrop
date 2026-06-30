@@ -1,5 +1,5 @@
 // GET /api/validate?id=<tweetUrlOrId>&ticker=<$TICKER>  ->  Verdict
-// Instant feedback for the submit form. UX only — run-campaign-x re-validates at ingest.
+// Instant feedback for the submit form. UX only - run-campaign-x re-validates at ingest.
 import { validateTweet } from "@/lib/tweet";
 
 export async function GET(req: Request) {

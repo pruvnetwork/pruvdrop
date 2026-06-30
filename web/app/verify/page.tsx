@@ -27,7 +27,7 @@ export default function Verify() {
         <span className="pill">Proof</span>
         <h1>Verify the allocation</h1>
         <div className="lead">
-          Fairness here isn&apos;t a promise — it&apos;s recomputable. Everything you need to
+          Fairness here isn&apos;t a promise - it&apos;s recomputable. Everything you need to
           check the winners yourself is public and anchored on-chain.
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function Verify() {
           <div className="note">
             The recipient list is hashed into the Merkle root above and committed on-chain
             before any claim opens. A per-recipient nullifier means each address can claim once.
-            The root cannot be edited after commitment — so the winner list is fixed and tamper-evident.
+            The root cannot be edited after commitment - so the winner list is fixed and tamper-evident.
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function Verify() {
           <div className="kv"><span className="k">Campaign config</span><span className="v"><a href="/config.json" target="_blank">config.json ↗</a></span></div>
           <div className="note">
             Because submissions come from public posts (Farcaster / X), anyone can re-pull the
-            same data independently — there is no private list only the operator can see.
+            same data independently - there is no private list only the operator can see.
           </div>
         </div>
       </div>
@@ -65,10 +65,10 @@ export default function Verify() {
           <h2>Zero-knowledge allocation proof <span className="zkbadge">sound</span></h2>
           <div className="panel">
             <div className="kv"><span className="k">Scheme</span><span className="v mono">{proof.scheme}</span></div>
-            <div className="kv"><span className="k">Candidates (M)</span><span className="v">{proof.m ?? "—"}</span></div>
-            <div className="kv"><span className="k">Threshold (t)</span><span className="v">{proof.t ?? "—"}</span></div>
-            <div className="kv"><span className="k">Winners (N)</span><span className="v">{proof.n ?? "—"}</span></div>
-            <div className="kv"><span className="k">Pot</span><span className="v">{proof.pot?.toLocaleString() ?? "—"}</span></div>
+            <div className="kv"><span className="k">Candidates (M)</span><span className="v">{proof.m ?? "-"}</span></div>
+            <div className="kv"><span className="k">Threshold (t)</span><span className="v">{proof.t ?? "-"}</span></div>
+            <div className="kv"><span className="k">Winners (N)</span><span className="v">{proof.n ?? "-"}</span></div>
+            <div className="kv"><span className="k">Pot</span><span className="v">{proof.pot?.toLocaleString() ?? "-"}</span></div>
             <div className="kv"><span className="k">inputC (candidates commitment)</span><span className="v mono">{proof.input_c}</span></div>
             <div className="kv"><span className="k">claimC (winners commitment)</span><span className="v mono">{proof.claim_c}</span></div>
             <div className="kv"><span className="k">Proof hash (attested on-chain)</span><span className="v mono">{proof.proof_hash}</span></div>
@@ -76,7 +76,7 @@ export default function Verify() {
             <div className="note">
               A <b>single sound</b> Halo2 KZG/BN254 proof from <a href="https://github.com/pruvnetwork/pruvdrop/tree/main/prover" target="_blank">these circuits</a>:
               from the committed candidate set (<span className="mono">inputC</span>: wallet + score), <b>exactly N pass the threshold</b>,
-              winners receive <b>conserved amounts</b> (losers 0, Σ = pot), all committed in <span className="mono">claimC</span> — every step
+              winners receive <b>conserved amounts</b> (losers 0, Σ = pot), all committed in <span className="mono">claimC</span> - every step
               constrained (sound Poseidon, no free witness). This sample uses a dev SRS over a sample allocation; production uses a real
               powers-of-tau and the live campaign. See <a href="https://github.com/pruvnetwork/pruvdrop/blob/main/docs/ZK-ALLOCATION-PROOF.md" target="_blank">the design ↗</a>.
             </div>
@@ -88,13 +88,13 @@ export default function Verify() {
         <h2>Recompute it yourself</h2>
         <div className="panel">
           <div className="li"><span className="ic c">1</span><span>Pull the public posts carrying the campaign tag, with their engagement.</span></div>
-          <div className="li"><span className="ic c">2</span><span>Apply the published scoring + allocation rules — deterministic, no operator discretion.</span></div>
+          <div className="li"><span className="ic c">2</span><span>Apply the published scoring + allocation rules - deterministic, no operator discretion.</span></div>
           <div className="li"><span className="ic c">3</span><span>Build the claim Merkle tree from the result.</span></div>
           <div className="li"><span className="ic c">4</span><span>Check your root equals the on-chain root above. If it matches, the allocation was honest.</span></div>
           <div className="note">
             Open-source pipeline: <a href="https://github.com/pruvnetwork/pruvdrop" target="_blank">github.com/pruvnetwork/pruvdrop ↗</a>.
             For lottery-mode campaigns, the random seed is the hash of a future Solana slot,
-            committed before it exists — so the operator cannot steer who wins.
+            committed before it exists - so the operator cannot steer who wins.
           </div>
         </div>
       </div>

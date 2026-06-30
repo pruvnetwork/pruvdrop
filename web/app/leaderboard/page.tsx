@@ -34,7 +34,7 @@ export default function Leaderboard() {
         <h1>Leaderboard</h1>
         <div className="lead">
           The most viral {source === "submissions" ? "submitted" : "Farcaster"} posts mentioning $ANSEM, ranked.
-          Final winners are <b>committed on-chain before the draw</b> — climb by posting, verify the result yourself.
+          Final winners are <b>committed on-chain before the draw</b> - climb by posting, verify the result yourself.
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export default function Leaderboard() {
           {err ? (
             <div className="status bad">Could not load standings.</div>
           ) : rows.length === 0 ? (
-            <div className="status muted">No entries yet — be the first. <a href="/submit">Submit your tweet →</a></div>
+            <div className="status muted">No entries yet - be the first. <a href="/submit">Submit your tweet →</a></div>
           ) : (
             <table className="lb">
               <thead>
@@ -71,7 +71,7 @@ export default function Leaderboard() {
         </div>
         <div className="note center">
           Standings update as new posts come in. Allocation is deterministic from these
-          public posts — <a href="/verify">verify the fairness →</a>
+          public posts - <a href="/verify">verify the fairness →</a>
         </div>
       </div>
 

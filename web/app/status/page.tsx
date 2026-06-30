@@ -35,7 +35,7 @@ export default function Status() {
         <h1>Check your status</h1>
         <div className="lead">
           See your current standing before the draw. Winners are committed on-chain at the
-          deadline — keep posting to climb.
+          deadline - keep posting to climb.
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export default function Status() {
         </div>
         <div className="note center">
           Final winners are picked deterministically from these public posts and committed
-          on-chain — <a href="/verify">verify the fairness →</a>
+          on-chain - <a href="/verify">verify the fairness →</a>
         </div>
       </div>
     </div>

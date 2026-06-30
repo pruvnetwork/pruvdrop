@@ -1,6 +1,6 @@
 // Browser-side provably-fair allocation simulation.
 // Uses Web Crypto SHA-256 and the SAME Merkle leaf/node scheme as the on-chain
-// claim program — so the roots it shows are authentic, not mocked. No backend.
+// claim program - so the roots it shows are authentic, not mocked. No backend.
 
 const enc = new TextEncoder();
 
@@ -69,7 +69,7 @@ async function merkleRoot(leaves: Uint8Array[]): Promise<Uint8Array> {
   }
   return level[0];
 }
-// input commitment leaf — a hash of (handle, score); any consistent scheme works
+// input commitment leaf - a hash of (handle, score); any consistent scheme works
 async function inputLeaf(handle: string, score: number): Promise<Uint8Array> {
   return sha256(concat(Uint8Array.of(2), enc.encode(handle), u64le(Math.round(score * 100))));
 }
@@ -136,7 +136,7 @@ export async function runSim(pool: SimCandidate[], opts: SimOpts): Promise<SimRe
     selected = order.map((i) => cands[i]);
   }
 
-  // 3) amounts — proportional to score
+  // 3) amounts - proportional to score
   const sumScore = selected.reduce((s, c) => s + c.score, 0) || 1;
   const winners: Winner[] = [];
   let dist = 0;

@@ -12,10 +12,10 @@ const DESC = "Provably-fair $ANSEM airdrop on Solana. Committed before the draw,
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pruvdrop.vercel.app"),
-  title: "pruvdrop — $ANSEM verifiable viral airdrop",
+  title: "pruvdrop - $ANSEM verifiable viral airdrop",
   description: DESC,
   openGraph: {
-    title: "$ANSEM Airdrop — pruvdrop",
+    title: "$ANSEM Airdrop - pruvdrop",
     description: DESC,
     url: "https://pruvdrop.vercel.app",
     siteName: "pruvdrop",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "$ANSEM Airdrop — pruvdrop",
+    title: "$ANSEM Airdrop - pruvdrop",
     description: DESC,
   },
 };

@@ -13,7 +13,7 @@ export default function Countdown({ to }: { to: string }) {
   const target = new Date(to).getTime();
   const pad = (n: number) => String(n).padStart(2, "0");
 
-  let body: React.ReactNode = "—";
+  let body: React.ReactNode = "-";
   if (now !== null) {
     let diff = target - now;
     if (isNaN(target)) body = "TBA";

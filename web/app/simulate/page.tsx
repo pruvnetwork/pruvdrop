@@ -85,19 +85,19 @@ export default function Simulate() {
         {res && (
           <>
             <div className="simstep"><span className="sn">1</span><div>
-              <div className="st">Commit — input root</div>
+              <div className="st">Commit - input root</div>
               <div className="muted" style={{ fontSize: 12 }}>Merkle root of all {res.poolSize} candidates, committed <b>before</b> the seed.</div>
               <code className="rootline">{res.inputRoot}</code>
             </div></div>
 
             <div className="simstep"><span className="sn">2</span><div>
-              <div className="st">Reveal — draw seed</div>
+              <div className="st">Reveal - draw seed</div>
               <div className="muted" style={{ fontSize: 12 }}>Public randomness (on-chain: a slot hash). Can&apos;t be known at commit time.</div>
               <code className="rootline">{res.seedHex}</code>
             </div></div>
 
             <div className="simstep"><span className="sn">3</span><div>
-              <div className="st">Draw — winners ({res.mode === "lottery" ? "weighted by virality" : "top by virality"})</div>
+              <div className="st">Draw - winners ({res.mode === "lottery" ? "weighted by virality" : "top by virality"})</div>
               <table className="lb" style={{ marginTop: 10 }}>
                 <thead><tr><th className="rank">#</th><th>Account</th><th>Wallet</th><th className="num">Score</th><th className="num">$ANSEM</th></tr></thead>
                 <tbody>
@@ -115,7 +115,7 @@ export default function Simulate() {
             </div></div>
 
             <div className="simstep"><span className="sn">4</span><div>
-              <div className="st">Claim root — what goes on-chain</div>
+              <div className="st">Claim root - what goes on-chain</div>
               <div className="muted" style={{ fontSize: 12 }}>The winners hash into this root. Anyone recomputes it from the public draw.</div>
               <code className="rootline good">{res.claimRoot}</code>
             </div></div>
@@ -133,17 +133,17 @@ export default function Simulate() {
                 <div className="kv"><span className="k">rules</span><span className="v mono">{res.mode} · {res.n} winners · {res.pot.toLocaleString()} $ANSEM</span></div>
               </div>
               <div style={{ marginTop: 10 }}>
-                <div className="muted" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: ".06em" }}>proof commitment — attested on-chain (proof_hash)</div>
+                <div className="muted" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: ".06em" }}>proof commitment - attested on-chain (proof_hash)</div>
                 <code className="rootline">{res.proofHash}</code>
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
                 <button className="secondary" style={{ width: "auto" }} onClick={verifyProof}>Verify proof</button>
-                {verify === true && <span className="good" style={{ fontSize: 13, fontWeight: 600 }}>✓ statement verified — matches the on-chain commitment</span>}
+                {verify === true && <span className="good" style={{ fontSize: 13, fontWeight: 600 }}>✓ statement verified - matches the on-chain commitment</span>}
                 {verify === false && <span className="bad" style={{ fontSize: 13, fontWeight: 600 }}>✗ mismatch</span>}
               </div>
               <div className="note">
                 Today you verify by <b>recomputing</b> (this page just did). <b>Phase 2</b> replaces the
-                recompute with a succinct Halo2 proof — verify the whole draw without redoing it.{" "}
+                recompute with a succinct Halo2 proof - verify the whole draw without redoing it.{" "}
                 <a href="/verify">how it works →</a>
               </div>
             </div></div>
@@ -168,7 +168,7 @@ export default function Simulate() {
         )}
 
         <div className="note center">
-          This is the real mechanism, not a mock — it runs the on-chain Merkle scheme in your
+          This is the real mechanism, not a mock - it runs the on-chain Merkle scheme in your
           browser. <a href="/verify">How verification works →</a>
         </div>
       </div>

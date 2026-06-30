@@ -17,7 +17,7 @@ export default function Home() {
         <span className="pill">Solana · $ANSEM · provably fair</span>
         <h1>$ANSEM, distributed fairly.<br />And you can prove it.</h1>
         <div className="lead">
-          No insider list. No free wallets. The most viral $ANSEM posts win — and the
+          No insider list. No free wallets. The most viral $ANSEM posts win - and the
           allocation is <b>committed on-chain before the draw</b>, so anyone can
           recompute the winners. Earned by the community, not handed to insiders.
         </div>
@@ -41,13 +41,13 @@ export default function Home() {
           <div className="panel bad-tint">
             <h3>How memecoin drops usually go</h3>
             <div className="li"><span className="ic x">✕</span><span>Supply concentrated in a few wallets</span></div>
-            <div className="li"><span className="ic x">✕</span><span>Opaque allocation — trust the team</span></div>
+            <div className="li"><span className="ic x">✕</span><span>Opaque allocation - trust the team</span></div>
             <div className="li"><span className="ic x">✕</span><span>Free allocations to insiders</span></div>
             <div className="li"><span className="ic x">✕</span><span>No way to check who got what, or why</span></div>
           </div>
           <div className="panel good-tint">
             <h3>How pruvdrop does it</h3>
-            <div className="li"><span className="ic c">✓</span><span>Earned by virality — you post, you qualify</span></div>
+            <div className="li"><span className="ic c">✓</span><span>Earned by virality - you post, you qualify</span></div>
             <div className="li"><span className="ic c">✓</span><span>Allocation committed on-chain before the draw</span></div>
             <div className="li"><span className="ic c">✓</span><span>Full recipient list is public</span></div>
             <div className="li"><span className="ic c">✓</span><span>Recompute the winners yourself</span></div>
@@ -66,7 +66,7 @@ export default function Home() {
           <div className="note">
             The recipient list is committed to the Merkle root above, anchored on-chain
             <b style={{ color: "var(--fg)" }}> before</b> anyone can claim. Pull the public posts,
-            apply the published rules, and you get the exact same winners and amounts — the
+            apply the published rules, and you get the exact same winners and amounts - the
             on-chain root proves the list wasn&apos;t changed after the fact.
           </div>
           <div className="cta" style={{ justifyContent: "flex-start", marginTop: 14 }}>
