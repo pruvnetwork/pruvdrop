@@ -130,6 +130,16 @@ input:focus { outline: none; border-color: var(--accent); }
 .cdlabel { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
 .cdval { font-size: 24px; font-weight: 800; font-family: var(--font-mono), ui-monospace, monospace; letter-spacing: -0.5px; }
 
+/* footer */
+.ftr { border-top: 1px solid var(--line); padding: 26px 20px 30px; margin-top: 40px; }
+.ftr-inner { max-width: 780px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ftr-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.ftr-dim { color: var(--faint); font-weight: 400; font-size: 13px; }
+.ftr-nav { display: flex; gap: 16px; flex-wrap: wrap; }
+.ftr-nav a { color: var(--muted); font-size: 14px; }
+.ftr-nav a:hover { color: var(--fg); }
+.ftr-note { max-width: 780px; margin: 16px auto 0; color: var(--faint); font-size: 12px; text-align: center; }
+
 /* header */
 .hdr {
   position: sticky; top: 0; z-index: 40;
