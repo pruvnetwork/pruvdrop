@@ -1,6 +1,12 @@
 "use client";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import ThemeToggle from "./ThemeToggle";
+
+const WalletMultiButton = dynamic(
+  () => import("@solana/wallet-adapter-react-ui").then((m) => m.WalletMultiButton),
+  { ssr: false }
+);
 
 const NAV = [
   { href: "/submit", label: "Submit" },
@@ -26,7 +32,7 @@ export default function Header() {
       </nav>
       <div className="hdr-right">
         <ThemeToggle />
-        <a className="hdr-connect" href="/claim">Connect</a>
+        <WalletMultiButton />
       </div>
     </header>
   );
