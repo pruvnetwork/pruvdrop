@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { runSim, claimRootOf, randomSeed, type SimCandidate, type SimResult } from "@/lib/sim";
+import { runSim, claimRootOf, computeProofHash, randomSeed, type SimCandidate, type SimResult } from "@/lib/sim";
 
 export default function Simulate() {
   const [pool, setPool] = useState<SimCandidate[]>([]);
@@ -10,6 +10,7 @@ export default function Simulate() {
   const [seed, setSeed] = useState("ansem-2026");
   const [res, setRes] = useState<SimResult | null>(null);
   const [tampered, setTampered] = useState<string | null>(null);
+  const [verify, setVerify] = useState<null | boolean>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -20,9 +21,15 @@ export default function Simulate() {
 
   async function run() {
     if (!pool.length) return;
-    setBusy(true); setTampered(null);
+    setBusy(true); setTampered(null); setVerify(null);
     const r = await runSim(pool, { n, pot, mode, seed });
     setRes(r); setBusy(false);
+  }
+
+  async function verifyProof() {
+    if (!res) return;
+    const recomputed = await computeProofHash(res.inputRoot, res.seedHex, res.claimRoot, res.mode, res.n, res.pot);
+    setVerify(recomputed === res.proofHash);
   }
 
   async function tamper() {
@@ -111,6 +118,34 @@ export default function Simulate() {
               <div className="st">Claim root — what goes on-chain</div>
               <div className="muted" style={{ fontSize: 12 }}>The winners hash into this root. Anyone recomputes it from the public draw.</div>
               <code className="rootline good">{res.claimRoot}</code>
+            </div></div>
+
+            <div className="simstep"><span className="sn">5</span><div>
+              <div className="st">Prove <span className="zkbadge">ZK · preview</span></div>
+              <div className="muted" style={{ fontSize: 12 }}>
+                The public statement a <b>PRUV Halo2 proof</b> binds: that this claim root is the
+                correct output of the rules over the committed inputs and seed.
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <div className="kv"><span className="k">input root</span><span className="v mono">{res.inputRoot.slice(0, 22)}…</span></div>
+                <div className="kv"><span className="k">seed</span><span className="v mono">{res.seedHex.slice(0, 22)}…</span></div>
+                <div className="kv"><span className="k">claim root</span><span className="v mono">{res.claimRoot.slice(0, 22)}…</span></div>
+                <div className="kv"><span className="k">rules</span><span className="v mono">{res.mode} · {res.n} winners · {res.pot.toLocaleString()} $ANSEM</span></div>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <div className="muted" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: ".06em" }}>proof commitment — attested on-chain (proof_hash)</div>
+                <code className="rootline">{res.proofHash}</code>
+              </div>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
+                <button className="secondary" style={{ width: "auto" }} onClick={verifyProof}>Verify proof</button>
+                {verify === true && <span className="good" style={{ fontSize: 13, fontWeight: 600 }}>✓ statement verified — matches the on-chain commitment</span>}
+                {verify === false && <span className="bad" style={{ fontSize: 13, fontWeight: 600 }}>✗ mismatch</span>}
+              </div>
+              <div className="note">
+                Today you verify by <b>recomputing</b> (this page just did). <b>Phase 2</b> replaces the
+                recompute with a succinct Halo2 proof — verify the whole draw without redoing it.{" "}
+                <a href="/verify">how it works →</a>
+              </div>
             </div></div>
 
             <div className="panel" style={{ marginTop: 14, borderColor: tampered ? "var(--bad)" : undefined }}>

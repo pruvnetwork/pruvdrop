@@ -24,6 +24,11 @@ function u64le(n: number): Uint8Array {
 export function hex(b: Uint8Array): string {
   return Array.from(b).map((x) => x.toString(16).padStart(2, "0")).join("");
 }
+function hexToBytes(h: string): Uint8Array {
+  const b = new Uint8Array(h.length / 2);
+  for (let i = 0; i < b.length; i++) b[i] = parseInt(h.substr(i * 2, 2), 16);
+  return b;
+}
 function cmp(a: Uint8Array, b: Uint8Array): number {
   for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i] - b[i]; }
   return 0;
@@ -85,6 +90,18 @@ export interface Winner { rank: number; handle: string; wallet: string; walletBy
 export interface SimResult {
   inputRoot: string; seedHex: string; claimRoot: string;
   winners: Winner[]; poolSize: number; mode: string;
+  n: number; pot: number; proofHash: string;
+}
+
+// SHA-256 digest of the public statement {inputRoot, seed, claimRoot, rules}.
+// This is the 32-byte artifact PRUV's attestation records on-chain (proof_hash).
+// NOTE: a real Halo2 proof (Phase 2) additionally proves the allocation FUNCTION is
+// correct; this digest only binds the result. See docs/ZK-ALLOCATION-PROOF.md.
+export async function computeProofHash(
+  inputRoot: string, seedHex: string, claimRoot: string, mode: string, n: number, pot: number
+): Promise<string> {
+  const stmt = concat(hexToBytes(inputRoot), hexToBytes(seedHex), hexToBytes(claimRoot), enc.encode(`${mode}:${n}:${pot}`));
+  return hex(await sha256(stmt));
 }
 
 export interface SimOpts { n: number; pot: number; mode: "topn" | "lottery"; seed: string }
@@ -134,8 +151,10 @@ export async function runSim(pool: SimCandidate[], opts: SimOpts): Promise<SimRe
   // 4) claimRoot over winner leaves (authentic on-chain scheme)
   const claimLeaves = await Promise.all(winners.map((w, i) => claimLeaf(i, w.walletBytes, w.amount)));
   const claimRoot = hex(await merkleRoot(claimLeaves));
+  const seedHex = hex(seed);
+  const proofHash = await computeProofHash(inputRoot, seedHex, claimRoot, opts.mode, n, opts.pot);
 
-  return { inputRoot, seedHex: hex(seed), claimRoot, winners, poolSize: cands.length, mode: opts.mode };
+  return { inputRoot, seedHex, claimRoot, winners, poolSize: cands.length, mode: opts.mode, n, pot: opts.pot, proofHash };
 }
 
 // recompute claimRoot after tampering one winner's amount (for the tamper demo)
