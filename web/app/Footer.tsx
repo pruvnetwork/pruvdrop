@@ -10,6 +10,7 @@ export default function Footer() {
         <nav className="ftr-nav">
           <a href="/submit">Submit</a>
           <a href="/leaderboard">Leaderboard</a>
+          <a href="/simulate">Simulate</a>
           <a href="/status">Status</a>
           <a href="/verify">Verify</a>
           <a href="/faq">FAQ</a>

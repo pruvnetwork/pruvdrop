@@ -130,6 +130,23 @@ input:focus { outline: none; border-color: var(--accent); }
 .cdlabel { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
 .cdval { font-size: 24px; font-weight: 800; font-family: var(--font-mono), ui-monospace, monospace; letter-spacing: -0.5px; }
 
+/* simulation */
+.simctl { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.simctl label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.simctl input[type=range] { width: 100%; accent-color: var(--accent); padding: 0; }
+.seg { display: flex; gap: 6px; }
+.seg button { width: auto; flex: 1; padding: 9px; font-size: 12.5px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.seg button.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: 0; }
+.seedrow { display: flex; gap: 6px; }
+.seedrow input { flex: 1; }
+.dice { width: 44px; flex: none; padding: 0; font-size: 16px; background: var(--surface-2); border: 1px solid var(--line); }
+.simstep { display: flex; gap: 14px; margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+.simstep .sn { flex: none; width: 26px; height: 26px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.simstep .st { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+.rootline { display: block; margin-top: 8px; font-family: var(--font-mono), monospace; font-size: 11.5px; word-break: break-all; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.rootline.good { color: var(--good); border-color: #00d29438; }
+@media (max-width: 640px) { .simctl { grid-template-columns: 1fr; } }
+
 /* footer */
 .ftr { border-top: 1px solid var(--line); padding: 26px 20px 30px; margin-top: 40px; }
 .ftr-inner { max-width: 780px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
