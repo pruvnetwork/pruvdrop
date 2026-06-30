@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Submit your tweet — Airdrop</title>
+<style>
+  :root { --bg:#0b0e14; --card:#121722; --line:#222a39; --fg:#e6e9ef; --muted:#8b95a7; --accent:#5b8cff; --good:#36d399; --warn:#f6c344; --bad:#ff5b6e; }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:480px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+  .steps{font-size:13px;color:var(--muted);background:#0e1320;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:18px}
+  .steps b{color:var(--fg)}
+  input{width:100%;border:1px solid var(--line);background:#0e1320;color:var(--fg);border-radius:10px;padding:12px;font-size:14px}
+  button{width:100%;margin-top:12px;border:0;border-radius:10px;padding:13px;font-size:15px;font-weight:600;background:var(--accent);color:#fff;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  #result{margin-top:16px;font-size:14px;min-height:20px}
+  .ok{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)} .muted{color:var(--muted)}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;background:#1b2233;color:var(--muted);margin-bottom:10px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="pill" id="tickerPill">$TICKER</span>
+    <h1>Submit your tweet</h1>
+    <div class="sub">Tweet about the campaign, include your Solana address in the tweet, then paste the link here. Eligibility is proven on-chain — no insider list.</div>
+    <div class="steps">
+      <b>To qualify:</b><br>
+      1. Tweet and mention <b id="tickerInline">$TICKER</b><br>
+      2. Include your <b>Solana wallet address</b> in the tweet text<br>
+      3. Paste the tweet link below
+    </div>
+    <input id="url" placeholder="https://x.com/you/status/123..." autocomplete="off" />
+    <button id="checkBtn">Check my tweet</button>
+    <div id="result"></div>
+  </div>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+let cfg = { ticker: "$TICKER", collectWebhook: "" };
+try { cfg = { ...cfg, ...(await (await fetch("config.json")).json()) }; } catch {}
+$("tickerPill").textContent = cfg.ticker;
+$("tickerInline").textContent = cfg.ticker;
+
+function show(msg, cls="muted"){ const r=$("result"); r.innerHTML=msg; r.className=cls; }
+
+async function check(){
+  const url = $("url").value.trim();
+  if(!url){ show("Paste your tweet link first.", "warn"); return; }
+  $("checkBtn").disabled = true; show("Checking…", "muted");
+  let v;
+  try {
+    const r = await fetch(`/api/validate?id=${encodeURIComponent(url)}&ticker=${encodeURIComponent(cfg.ticker)}`);
+    v = await r.json();
+  } catch { show("Could not reach the validator. Try again.", "bad"); $("checkBtn").disabled=false; return; }
+
+  if (v.ok) {
+    // optional collection
+    let recorded = true;
+    if (cfg.collectWebhook) {
+      try {
+        await fetch(cfg.collectWebhook, { method:"POST", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ id:v.id, wallet:v.wallet, handle:v.handle, likes:v.likes }) });
+      } catch { recorded = false; }
+    }
+    show(`✅ <b>You qualify!</b> @${v.handle} · ${v.likes} likes<br><span class="mono muted">wallet ${v.wallet.slice(0,6)}…${v.wallet.slice(-4)} verified from your tweet</span>${recorded ? '<br><span class="muted">Entry recorded. Final ranking is by virality.</span>' : ''}`, "ok");
+    $("checkBtn").textContent = "Checked ✓";
+    return;
+  }
+  const m = {
+    no_ticker: `⚠️ Your tweet doesn't mention <b>${cfg.ticker}</b>. Add it and tweet again.`,
+    no_wallet: `⚠️ No Solana address found in your tweet. Add your <b>Solana wallet address</b> to the tweet text and resubmit.`,
+    not_found: "Couldn't read that tweet. Check the link is public and correct.",
+    bad_url: "That doesn't look like a tweet link.",
+  }[v.reason] || "Could not validate that tweet.";
+  show(m, v.reason==="no_ticker"||v.reason==="no_wallet" ? "warn" : "bad");
+  $("checkBtn").disabled = false;
+}
+$("checkBtn").onclick = check;
+$("url").addEventListener("keydown", (e)=>{ if(e.key==="Enter") check(); });
+</script>
+</body>
+</html>

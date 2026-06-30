@@ -125,6 +125,13 @@ resistance is weaker than Farcaster (no quality score). A tweet with the ticker
 Solana address to qualify"). Use X for reach (e.g. an X-native influencer's
 audience); use Farcaster for the cleanest data + sybil resistance.
 
+**Instant-validation submit form** (`app/submit/` + `app/api/validate.js`): an
+optional static form where casters paste their tweet link and get instant
+feedback ("you qualify" / "add your Solana address"). It validates server-side
+(the syndication endpoint blocks browser CORS) and collects valid entries via a
+configurable webhook. Deploy the `app/` directory on Vercel to serve `/submit`,
+`/api/validate`, and `/portal` together. See `app/submit/README.md`.
+
 ## Fairness
 
 - **Allocation**: zero operator trust — deterministic from the committed snapshot
