@@ -182,9 +182,13 @@ then weighted-lottery mode, then recursion for large M.
   top-N circuit (replace the RLC fingerprint with this Poseidon-Merkle `inputRoot` binding)
   and upstream the gadget into pruv-circuits to fix `merkle`/`governance`/Phase-1 at the
   protocol level.
-- **Phase-2 spike binding is RLC, not Merkle.** `prover/src/topn.rs` binds scores to a
-  public fingerprint `C = Σ scoreᵢ·rⁱ` (soundly constrained with our own gates) because the
-  Poseidon gadget above isn't sound yet. Production swaps this for the Poseidon-Merkle root.
+- **Sound counting over a committed set — built.** `prover/src/combined.rs` (`--combined`)
+  binds the scores to a sound **Poseidon-chain** commitment `C` (each step the constrained
+  permutation, score cells shared with the comparator by copy constraints) and proves exactly
+  N are ≥ t over that committed set. Both a false count and a swapped score are rejected — the
+  RLC fingerprint of the earlier spike is now replaced by a real Poseidon binding. (`topn.rs`
+  keeps the RLC version for reference.) Production can swap the chain for a Poseidon-Merkle root
+  — the gadget exists in `merkle.rs` — for cheap on-chain inclusion.
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we
   already commit — say exactly that, not "provably-fair-by-ZK".
 - **Prover scale.** Set-size-linear prover; very large campaigns need the chunk+recurse path.

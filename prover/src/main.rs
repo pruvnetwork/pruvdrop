@@ -23,6 +23,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+mod combined;
 #[path = "merkle.rs"]
 mod zkmerkle;
 mod poseidon;
@@ -51,6 +52,9 @@ struct Args {
     /// prove + verify sound in-circuit Merkle inclusion (Poseidon chain)
     #[arg(long)]
     merkle_gadget: bool,
+    /// prove + verify sound counting over a Poseidon-committed set (top-N + binding)
+    #[arg(long)]
+    combined: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -150,6 +154,9 @@ fn main() -> Result<()> {
     }
     if args.merkle_gadget {
         return zkmerkle::run_merkle_test();
+    }
+    if args.combined {
+        return combined::run_combined();
     }
     if args.spike {
         return topn::run_spike();
