@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.95.4",
+    "@vercel/kv": "^3.0.0",
     "buffer": "^6.0.3",
     "next": "^14.2.35",
     "react": "^18.3.1",

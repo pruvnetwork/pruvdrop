@@ -10,6 +10,8 @@
     "allocate": "tsx src/run-allocate.ts",
     "claimtree": "tsx src/run-claimtree.ts",
     "portal": "tsx src/run-portal.ts",
+    "leaderboard": "tsx src/run-leaderboard.ts",
+    "build-campaign": "tsx src/build-campaign.ts",
     "demo": "tsx src/demo-full.ts",
     "selftest": "tsx src/selftest.ts",
     "selftest:alloc": "tsx src/selftest-allocate.ts",

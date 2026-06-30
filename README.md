@@ -153,6 +153,39 @@ Both talk to the same on-chain program; pick one to deploy.
   is open, so anyone can re-pull and recompute the root.
 - **Distribution**: Merkle-drop with a per-recipient nullifier (one claim each).
 
+## Running a live campaign (operator)
+
+```bash
+# 1. ingest submissions (X claim-based, or Farcaster auto-scan)
+cd app
+NEYNAR_API_KEY=... npm run campaign -- ./campaign.json          # Farcaster, OR:
+npm run campaign:x -- ./tweets.json ./campaign-x.json           # X (wallet-in-tweet)
+#    -> out/snapshot.json, out/candidates.json, out/pending.json
+
+# 2. allocate + claim tree
+npm run allocate                                                # -> out/allocation.json
+npm run claimtree                                               # -> out/claims.json
+
+# 3. publish to the web app (config + claims + leaderboard)
+MINT=<token-mint> RPC=<rpc> npm run build-campaign              # -> web/public/{config,claims,leaderboard}.json
+#    (refresh the leaderboard any time during the campaign: npm run leaderboard)
+
+# 4. commit web/public + redeploy (Vercel)
+```
+
+### Collecting tweet submissions
+
+The submit form posts to `/api/submit`, which validates server-side and (if a store
+is configured) records the entry. To enable persistence — free on Vercel:
+
+1. Vercel project → **Storage → KV** (Upstash Redis, free tier) → connect. This sets
+   `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically.
+2. Set an `ADMIN_TOKEN` env var.
+3. Export collected ids: `GET /api/submissions?token=<ADMIN_TOKEN>` → put the tweet ids
+   into `app/tweets.json` and run `npm run campaign:x`.
+
+Without KV the form still validates (shows "verified") but does not persist — fine for a demo.
+
 ---
 
 Built with PRUV (verifiable allocation). Program + pipeline + portal in one repo.

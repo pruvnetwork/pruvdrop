@@ -19,22 +19,19 @@ export default function SubmitPage() {
     setBusy(true); setStatus({ msg: "Checking…", cls: "muted" });
     let v: any;
     try {
-      const r = await fetch(`/api/validate?id=${encodeURIComponent(url.trim())}&ticker=${encodeURIComponent(cfg.ticker)}`);
+      const r = await fetch(`/api/submit`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: url.trim(), ticker: cfg.ticker }),
+      });
       v = await r.json();
     } catch { setStatus({ msg: "Could not reach the validator. Try again.", cls: "bad" }); setBusy(false); return; }
 
     if (v.ok) {
-      let recorded = true;
-      if (cfg.collectWebhook) {
-        try {
-          await fetch(cfg.collectWebhook, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: v.id, wallet: v.wallet, handle: v.handle, likes: v.likes }),
-          });
-        } catch { recorded = false; }
-      }
+      const tail = v.persisted
+        ? '<br><span class="muted">Entry recorded. Final ranking is by virality.</span>'
+        : '<br><span class="muted">Verified. Final ranking is by virality.</span>';
       setStatus({
-        msg: `✅ <b>You qualify!</b> @${v.handle} · ${v.likes} likes<br><span class="mono muted">wallet ${v.wallet.slice(0, 6)}…${v.wallet.slice(-4)} verified from your tweet</span>${recorded ? '<br><span class="muted">Entry recorded. Final ranking is by virality.</span>' : ""}`,
+        msg: `✅ <b>You qualify!</b> @${v.handle} · ${v.likes} likes<br><span class="mono muted">wallet ${v.wallet.slice(0, 6)}…${v.wallet.slice(-4)} verified from your tweet</span>${tail}`,
         cls: "good",
       });
       setDone(true); setBusy(false); return;
