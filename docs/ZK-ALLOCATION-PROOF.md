@@ -198,9 +198,15 @@ then weighted-lottery mode, then recursion for large M.
   `Σ amount_i = pot` (public), and `claimC` commits `(wallet_i, amount_i)` — the claim-tree
   contents. Verified with proportional amounts `[3750,0,6250]` summing to pot; a wrong pot and
   paying a loser are both rejected. The amount *values* are the operator's published split
-  (∝ score, re-checkable from public scores); **remaining:** enforce proportional rounding
-  in-circuit, a Merkle `claimRoot` (vs the chain), weighted-lottery mode, recursion for scale,
-  then upstream the gadgets into pruv-circuits + a real SRS + audit.
+  (∝ score, re-checkable from public scores); **remaining:** a Merkle `claimRoot` (vs the
+  chain), weighted-lottery mode, recursion for scale, then upstream the gadgets into
+  pruv-circuits + a real SRS + audit.
+- **Proportional payout — proven.** `prover/src/proportional.rs` (`--proportional`) makes the
+  amounts provably correct, not trusted: for each winner it proves `pot·score_i = amount_i·S +
+  rem_i` with `0 ≤ rem_i < S` and `amount_i` range-bounded (so `amount_i = ⌊pot·score_i/S⌋` over
+  the integers, no field wraparound), `S = Σ score_i` in-circuit, and `Σ amount + dust = pot`
+  with tiny bounded dust. A tampered (non-floor) amount has no valid `rem` and is rejected.
+  This closes the last soundness gap — the payout *rule* is now provable, not just conservation.
 - **Boundary tie-break — built.** `prover/src/tiebreak.rs` (`--tiebreak`) orders candidates by
   `(score desc, index asc)`: `win_i = [score_i>t_s] OR ([score_i==t_s] AND [i≤t_idx])`, using an
   is-zero gadget for the equality and a small index comparator for the tie. Picks exactly N

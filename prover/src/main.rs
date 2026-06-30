@@ -28,6 +28,7 @@ mod combined;
 mod zkmerkle;
 mod payout;
 mod poseidon;
+mod proportional;
 mod selection;
 mod tiebreak;
 mod topn;
@@ -73,6 +74,9 @@ struct Args {
     /// prove + verify top-N with boundary tie-break (lexicographic score, index)
     #[arg(long)]
     tiebreak: bool,
+    /// prove + verify proportional payout: amount = floor(pot·score/S), in-circuit
+    #[arg(long)]
+    proportional: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -187,6 +191,9 @@ fn main() -> Result<()> {
     }
     if args.tiebreak {
         return tiebreak::run_tiebreak();
+    }
+    if args.proportional {
+        return proportional::run_proportional();
     }
     if args.spike {
         return topn::run_spike();
