@@ -138,6 +138,32 @@ No Solana-side pairing verifier required.
 | **2 — allocation-correctness** | the §3 selection/payout circuit (`inputRoot`+`seed`+rules ⟹ `claimRoot`); off-chain verify + attestation; `/verify` "verify the proof" | ~weeks (real ZK eng) | **the differentiator** — succinct proof the whole allocation is correct |
 | **3 — on-chain gating** | claim program requires matching `proof_hash` + pruv attestation | ~days on top of 2 | payouts bound to attested-correct allocation |
 
+## 6b. Phase 2 — locked design
+
+Decisions (agreed): **unify on Poseidon** end-to-end, **top-N mode first**, **spike before full build**.
+
+**Poseidon unification.** Migrate the claim tree + on-chain claim verify from SHA-256 to
+Poseidon (Light-Protocol-style: ~20 Poseidon hashes per claim path in BPF). Required so
+`inputRoot`, `claimRoot`, and the circuit all use one cheap-in-circuit hash. (SHA-256
+in-circuit is ~thousands of rows/hash; Poseidon is cheap.)
+
+**Top-N statement (no in-circuit sorting).** Prove "exactly N candidates have score ≥ t"
+with a threshold + counting argument:
+- per candidate `i`: a comparator `b_i = (score_i ≥ t)` proven via bit-decomposition of
+  `score_i − t + 2^B` (the MSB is the result); `b_i` boolean.
+- running sum `Σ b_i = N` (public). Tie-break at the boundary by wallet order.
+- a permutation/lookup binds the N winners to N distinct committed input leaves.
+Cost is **O(M)** (M = candidate count), dominated by re-hashing `inputRoot` in-circuit.
+
+**Spike (de-risk first).** A minimal circuit proving just the novel mechanic —
+`Σ_{i<M} (score_i ≥ t) = N` over witnessed scores, comparator via bit-decomposition,
+`t` and `N` public — on small M. No Poseidon, no payout (those are de-risked elsewhere).
+Validates the comparator + counting gates and measures `k` / prove time before the full
+build. Lives in `prover/src/topn.rs`, run with `pruvdrop-prover --spike`.
+
+After the spike: add Poseidon input-tree consistency, the payout chip, `claimRoot` output,
+then weighted-lottery mode, then recursion for large M.
+
 ## 7. Honest caveats
 
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we

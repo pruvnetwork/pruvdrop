@@ -23,6 +23,7 @@ pruv-circuits = { path = "../../pruv-solana-main/circuits" }
 halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", branch = "main" }
 
 anyhow = "1"
+rand = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"

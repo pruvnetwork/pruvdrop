@@ -23,6 +23,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+mod topn;
+
 #[derive(Parser)]
 struct Args {
     /// pruvdrop claim tree (out/claims.json from run-claimtree)
@@ -34,6 +36,9 @@ struct Args {
     /// output directory for allocation-proof.{json,bin}
     #[arg(long, default_value = "../web/public")]
     out: PathBuf,
+    /// run the Phase-2 top-N counting spike instead of the Phase-1 inclusion proof
+    #[arg(long)]
+    spike: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -124,6 +129,10 @@ fn merkle_path(leaves: &[Fr], idx: usize) -> (Fr, Vec<Fr>, Vec<bool>) {
 
 fn main() -> Result<()> {
     let args = Args::parse();
+
+    if args.spike {
+        return topn::run_spike();
+    }
 
     let raw = std::fs::read_to_string(&args.claims)
         .with_context(|| format!("read {}", args.claims.display()))?;
