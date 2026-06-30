@@ -1,16 +1,344 @@
 [
-  { "handle": "0xMidas", "posts": 5, "likes": 4820, "score": 612.3 },
-  { "handle": "degenharper", "posts": 3, "likes": 3910, "score": 547.8 },
-  { "handle": "solana_sasha", "posts": 4, "likes": 3140, "score": 498.1 },
-  { "handle": "bullpostmaxi", "posts": 6, "likes": 2680, "score": 441.6 },
-  { "handle": "ct_oracle", "posts": 2, "likes": 2510, "score": 402.9 },
-  { "handle": "anonfarmer", "posts": 3, "likes": 1980, "score": 358.4 },
-  { "handle": "mooncat_eth", "posts": 4, "likes": 1740, "score": 321.7 },
-  { "handle": "wifhat_chad", "posts": 2, "likes": 1520, "score": 288.0 },
-  { "handle": "pumpfun_pat", "posts": 3, "likes": 1310, "score": 254.2 },
-  { "handle": "gmgn_greg", "posts": 2, "likes": 1180, "score": 221.5 },
-  { "handle": "liquidity_lee", "posts": 1, "likes": 990, "score": 188.3 },
-  { "handle": "sol_sammy", "posts": 2, "likes": 870, "score": 161.0 },
-  { "handle": "the_blackbull", "posts": 1, "likes": 760, "score": 142.6 },
-  { "handle": "fairdrop_fan", "posts": 2, "likes": 640, "score": 118.9 }
+  {
+    "handle": "brixbounty",
+    "posts": 5,
+    "likes": 181,
+    "score": 11.7
+  },
+  {
+    "handle": "fyne",
+    "posts": 1,
+    "likes": 6,
+    "score": 7
+  },
+  {
+    "handle": "latenightonbase",
+    "posts": 1,
+    "likes": 37,
+    "score": 3.4
+  },
+  {
+    "handle": "zhiyad29",
+    "posts": 7,
+    "likes": 0,
+    "score": 3.4
+  },
+  {
+    "handle": "awkquarian",
+    "posts": 3,
+    "likes": 29,
+    "score": 2.3
+  },
+  {
+    "handle": "0xlex",
+    "posts": 2,
+    "likes": 7,
+    "score": 2.1
+  },
+  {
+    "handle": "frustration",
+    "posts": 3,
+    "likes": 22,
+    "score": 2
+  },
+  {
+    "handle": "hanndropers",
+    "posts": 4,
+    "likes": 0,
+    "score": 2
+  },
+  {
+    "handle": "wake",
+    "posts": 1,
+    "likes": 50,
+    "score": 1.7
+  },
+  {
+    "handle": "kazani",
+    "posts": 1,
+    "likes": 11,
+    "score": 1.5
+  },
+  {
+    "handle": "monteluna",
+    "posts": 3,
+    "likes": 9,
+    "score": 1.3
+  },
+  {
+    "handle": "runn3rr",
+    "posts": 1,
+    "likes": 14,
+    "score": 1.1
+  },
+  {
+    "handle": "toadyhawk.eth",
+    "posts": 2,
+    "likes": 19,
+    "score": 1
+  },
+  {
+    "handle": "mintclub",
+    "posts": 1,
+    "likes": 11,
+    "score": 0.9
+  },
+  {
+    "handle": "apeindaily",
+    "posts": 8,
+    "likes": 4,
+    "score": 0.9
+  },
+  {
+    "handle": "kadeh",
+    "posts": 2,
+    "likes": 7,
+    "score": 0.8
+  },
+  {
+    "handle": "clanker",
+    "posts": 10,
+    "likes": 0,
+    "score": 0.7
+  },
+  {
+    "handle": "paperswallet",
+    "posts": 1,
+    "likes": 0,
+    "score": 0.7
+  },
+  {
+    "handle": "0xael.eth",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.6
+  },
+  {
+    "handle": "solumsursum.eth",
+    "posts": 2,
+    "likes": 5,
+    "score": 0.5
+  },
+  {
+    "handle": "cryptojava",
+    "posts": 4,
+    "likes": 3,
+    "score": 0.5
+  },
+  {
+    "handle": "vlady",
+    "posts": 1,
+    "likes": 5,
+    "score": 0.5
+  },
+  {
+    "handle": "samxbt.eth",
+    "posts": 1,
+    "likes": 4,
+    "score": 0.4
+  },
+  {
+    "handle": "zktriumph",
+    "posts": 1,
+    "likes": 4,
+    "score": 0.4
+  },
+  {
+    "handle": "ksa",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.4
+  },
+  {
+    "handle": "satoshigem77",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.4
+  },
+  {
+    "handle": "joeblau",
+    "posts": 1,
+    "likes": 5,
+    "score": 0.4
+  },
+  {
+    "handle": "cassie",
+    "posts": 2,
+    "likes": 11,
+    "score": 0.4
+  },
+  {
+    "handle": "tradeai",
+    "posts": 5,
+    "likes": 1,
+    "score": 0.4
+  },
+  {
+    "handle": "axg",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.3
+  },
+  {
+    "handle": "anoncast",
+    "posts": 1,
+    "likes": 5,
+    "score": 0.3
+  },
+  {
+    "handle": "femmie",
+    "posts": 2,
+    "likes": 3,
+    "score": 0.3
+  },
+  {
+    "handle": "swim",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.3
+  },
+  {
+    "handle": "ai17z",
+    "posts": 1,
+    "likes": 0,
+    "score": 0.3
+  },
+  {
+    "handle": "bestcryptotwits",
+    "posts": 4,
+    "likes": 1,
+    "score": 0.3
+  },
+  {
+    "handle": "yes2crypto.eth",
+    "posts": 4,
+    "likes": 6,
+    "score": 0.2
+  },
+  {
+    "handle": "baseddesigner.eth",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.2
+  },
+  {
+    "handle": "alemac",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "wnews24",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "terricola.eth",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "ventra",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "amc",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "gokhan",
+    "posts": 1,
+    "likes": 3,
+    "score": 0.2
+  },
+  {
+    "handle": "catch0x22.eth",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "mecode",
+    "posts": 33,
+    "likes": 0,
+    "score": 0.2
+  },
+  {
+    "handle": "bisaegaksih.base.eth",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.2
+  },
+  {
+    "handle": "dany69.eth",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.2
+  },
+  {
+    "handle": "drrrner.eth",
+    "posts": 2,
+    "likes": 2,
+    "score": 0.2
+  },
+  {
+    "handle": "osagiie",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.1
+  },
+  {
+    "handle": "bitfloorsghost.eth",
+    "posts": 1,
+    "likes": 5,
+    "score": 0.1
+  },
+  {
+    "handle": "tldr",
+    "posts": 1,
+    "likes": 4,
+    "score": 0.1
+  },
+  {
+    "handle": "velvet-unicorn",
+    "posts": 2,
+    "likes": 1,
+    "score": 0.1
+  },
+  {
+    "handle": "joshisdead.eth",
+    "posts": 2,
+    "likes": 0,
+    "score": 0.1
+  },
+  {
+    "handle": "eggman.eth",
+    "posts": 1,
+    "likes": 2,
+    "score": 0.1
+  },
+  {
+    "handle": "neetguy.eth",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.1
+  },
+  {
+    "handle": "0xen",
+    "posts": 1,
+    "likes": 1,
+    "score": 0.1
+  },
+  {
+    "handle": "sirsu.eth",
+    "posts": 1,
+    "likes": 1,
+    "score": 0
+  }
 ]

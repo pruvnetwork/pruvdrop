@@ -15,11 +15,11 @@ export default function Leaderboard() {
     <div className="page">
       <a className="back" href="/">← back</a>
       <div className="hero" style={{ paddingTop: 18 }}>
-        <span className="pill">$ANSEM · live standings</span>
+        <span className="pill">$ANSEM · Farcaster · live</span>
         <h1>Leaderboard</h1>
         <div className="lead">
-          The most viral $ANSEM posts, ranked. Final winners are <b>committed on-chain
-          before the draw</b> — climb by posting, verify the result yourself.
+          The most viral Farcaster posts mentioning $ANSEM, ranked. Final winners are
+          <b> committed on-chain before the draw</b> — climb by posting, verify the result yourself.
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export default function Leaderboard() {
                 {rows.map((r, i) => (
                   <tr key={r.handle} className={i < 3 ? `top${i + 1}` : ""}>
                     <td className="rank num">{i + 1}</td>
-                    <td className="who"><a href={`https://x.com/${r.handle}`} target="_blank">@{r.handle}</a></td>
+                    <td className="who"><a href={`https://warpcast.com/${r.handle}`} target="_blank">@{r.handle}</a></td>
                     <td className="num">{r.posts}</td>
                     <td className="num">{r.likes.toLocaleString()}</td>
                     <td className="num score">{r.score.toFixed(1)}</td>
