@@ -43,6 +43,9 @@ struct Args {
     /// verify the native Poseidon permutation matches pruv hash_two (Step 1 of the gadget)
     #[arg(long)]
     poseidon_test: bool,
+    /// prove + verify the in-circuit constrained Poseidon permutation (Step 2 of the gadget)
+    #[arg(long)]
+    poseidon_gadget: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -136,6 +139,9 @@ fn main() -> Result<()> {
 
     if args.poseidon_test {
         return poseidon::run_test();
+    }
+    if args.poseidon_gadget {
+        return poseidon::run_gadget_test();
     }
     if args.spike {
         return topn::run_spike();

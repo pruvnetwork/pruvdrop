@@ -172,9 +172,12 @@ then weighted-lottery mode, then recursion for large M.
   *free* witness (the native value). So `merkle`, `governance_vote`, and therefore the
   **Phase-1 inclusion proof** are only sound for an *honest* prover; a malicious prover can
   forge hash steps (e.g. fake an inclusion). The real S-box gate (`SboxChip`) exists but is
-  not wired into a full Poseidon permutation. **Fix:** build a sound Poseidon-128 gadget
-  (SboxChip + MDS, full/partial rounds) in pruv-circuits, then the Poseidon-Merkle binding
-  replaces the spike's RLC fingerprint. Until then, do not claim malicious-prover soundness.
+  not wired into a full Poseidon permutation. **Fix — built:** a sound, fully-constrained
+  Poseidon-128 permutation now exists in `prover/src/poseidon.rs` (`--poseidon-gadget`):
+  every ARK / S-box (x⁵, degree-5 gate) / MDS step is constrained against light-poseidon's
+  exact width-3 constants, it matches `hash_two`, and a wrong output is rejected (1344 B,
+  k=11). **Next:** wire it into a Merkle-root gadget (replacing the RLC fingerprint binding)
+  and upstream it into pruv-circuits to fix `merkle`/`governance`/Phase-1 at the protocol level.
 - **Phase-2 spike binding is RLC, not Merkle.** `prover/src/topn.rs` binds scores to a
   public fingerprint `C = Σ scoreᵢ·rⁱ` (soundly constrained with our own gates) because the
   Poseidon gadget above isn't sound yet. Production swaps this for the Poseidon-Merkle root.
