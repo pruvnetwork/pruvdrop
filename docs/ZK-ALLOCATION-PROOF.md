@@ -199,8 +199,13 @@ then weighted-lottery mode, then recursion for large M.
   contents. Verified with proportional amounts `[3750,0,6250]` summing to pot; a wrong pot and
   paying a loser are both rejected. The amount *values* are the operator's published split
   (∝ score, re-checkable from public scores); **remaining:** enforce proportional rounding
-  in-circuit, boundary tie-break, a Merkle `claimRoot` (vs the chain), weighted-lottery mode,
-  recursion for scale, then upstream the gadgets into pruv-circuits + a real SRS + audit.
+  in-circuit, a Merkle `claimRoot` (vs the chain), weighted-lottery mode, recursion for scale,
+  then upstream the gadgets into pruv-circuits + a real SRS + audit.
+- **Boundary tie-break — built.** `prover/src/tiebreak.rs` (`--tiebreak`) orders candidates by
+  `(score desc, index asc)`: `win_i = [score_i>t_s] OR ([score_i==t_s] AND [i≤t_idx])`, using an
+  is-zero gadget for the equality and a small index comparator for the tie. Picks exactly N
+  through a 3-way boundary tie (three equal scores); a wrong N and a shifted boundary are
+  rejected. Folds into the allocation comparator so ties no longer block a clean threshold.
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we
   already commit — say exactly that, not "provably-fair-by-ZK".
 - **Prover scale.** Set-size-linear prover; very large campaigns need the chunk+recurse path.

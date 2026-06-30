@@ -29,6 +29,7 @@ mod zkmerkle;
 mod payout;
 mod poseidon;
 mod selection;
+mod tiebreak;
 mod topn;
 
 #[derive(Parser)]
@@ -69,6 +70,9 @@ struct Args {
     /// allocation input for --allocation
     #[arg(long, default_value = "../app/out/allocation-input.json")]
     alloc_input: PathBuf,
+    /// prove + verify top-N with boundary tie-break (lexicographic score, index)
+    #[arg(long)]
+    tiebreak: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -180,6 +184,9 @@ fn main() -> Result<()> {
     }
     if args.allocation {
         return payout::run_allocation(&args.alloc_input, &args.out);
+    }
+    if args.tiebreak {
+        return tiebreak::run_tiebreak();
     }
     if args.spike {
         return topn::run_spike();
