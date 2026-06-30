@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 interface Cfg { programId: string; rpcUrl: string; mint: string; claimRoot: string; }
-interface Proof { scheme: string; proof_hash: string; poseidon_root: string; proof_b64: string; wallet?: string; index?: number; }
+interface Proof { scheme: string; proof_hash: string; proof_b64: string; m?: number; t?: number; n?: number; pot?: number; input_c?: string; claim_c?: string; note?: string; }
 
 export default function Verify() {
   const [cfg, setCfg] = useState<Cfg | null>(null);
@@ -62,18 +62,23 @@ export default function Verify() {
 
       {proof && (
         <div className="section">
-          <h2>Zero-knowledge proof <span className="zkbadge">Phase 1</span></h2>
+          <h2>Zero-knowledge allocation proof <span className="zkbadge">sound</span></h2>
           <div className="panel">
             <div className="kv"><span className="k">Scheme</span><span className="v mono">{proof.scheme}</span></div>
-            <div className="kv"><span className="k">Poseidon root</span><span className="v mono">{proof.poseidon_root}</span></div>
+            <div className="kv"><span className="k">Candidates (M)</span><span className="v">{proof.m ?? "—"}</span></div>
+            <div className="kv"><span className="k">Threshold (t)</span><span className="v">{proof.t ?? "—"}</span></div>
+            <div className="kv"><span className="k">Winners (N)</span><span className="v">{proof.n ?? "—"}</span></div>
+            <div className="kv"><span className="k">Pot</span><span className="v">{proof.pot?.toLocaleString() ?? "—"}</span></div>
+            <div className="kv"><span className="k">inputC (candidates commitment)</span><span className="v mono">{proof.input_c}</span></div>
+            <div className="kv"><span className="k">claimC (winners commitment)</span><span className="v mono">{proof.claim_c}</span></div>
             <div className="kv"><span className="k">Proof hash (attested on-chain)</span><span className="v mono">{proof.proof_hash}</span></div>
             <div className="kv"><span className="k">Proof</span><span className="v"><a href="/allocation-proof.bin" target="_blank">allocation-proof.bin ↗</a> · {proofBytes} B</span></div>
             <div className="note">
-              A <b>real</b> Halo2 KZG/BN254 proof from <a href="https://github.com/pruvnetwork/pruvdrop/tree/main/prover" target="_blank">PRUV&apos;s circuits</a>:
-              it proves a winner&apos;s leaf is in the committed Poseidon tree. <b>Phase 1</b> proves
-              inclusion; the full allocation-correctness proof (the whole draw, without recomputing)
-              is <b>Phase 2</b>. This sample uses a dev SRS over a sample allocation — production uses
-              a real powers-of-tau and the live winners. See <a href="https://github.com/pruvnetwork/pruvdrop/blob/main/docs/ZK-ALLOCATION-PROOF.md" target="_blank">the plan ↗</a>.
+              A <b>single sound</b> Halo2 KZG/BN254 proof from <a href="https://github.com/pruvnetwork/pruvdrop/tree/main/prover" target="_blank">these circuits</a>:
+              from the committed candidate set (<span className="mono">inputC</span>: wallet + score), <b>exactly N pass the threshold</b>,
+              winners receive <b>conserved amounts</b> (losers 0, Σ = pot), all committed in <span className="mono">claimC</span> — every step
+              constrained (sound Poseidon, no free witness). This sample uses a dev SRS over a sample allocation; production uses a real
+              powers-of-tau and the live campaign. See <a href="https://github.com/pruvnetwork/pruvdrop/blob/main/docs/ZK-ALLOCATION-PROOF.md" target="_blank">the design ↗</a>.
             </div>
           </div>
         </div>

@@ -1,0 +1,14 @@
+{
+  "t": 100,
+  "pot": 50000,
+  "rows": [
+    {"wallet": "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump", "score": 612, "amount": 20306},
+    {"wallet": "7xKQ8m2pVnTgA1bRf5cZuDeWqYhJ3sN4tL6vP0oXyZ2", "score": 410, "amount": 13603},
+    {"wallet": "4hB3nW9kQxR7sT2vY6mC8dF1gJ5pL0aE3uZ7iN4oK6r", "score": 305, "amount": 10119},
+    {"wallet": "2fG7tH1nM4kP9rS6vX3cB8dQ5wZ0aL2eU7yI4oJ6sT9", "score": 180, "amount": 5972},
+    {"wallet": "8jL5mN2kR7tV4xC1bF9dH6gQ3wZ0aP2eY7uI4oS6nT8", "score": 95, "amount": 0},
+    {"wallet": "5kM8nP3rT6vY9xD2cG1bH4fJ7wZ0aL5eU8yI3oQ6sN4", "score": 60, "amount": 0},
+    {"wallet": "3nQ6mR9kT2vX5cB8dF1gH7jL0aP4eY9uI6oS3wZ2tN5", "score": 40, "amount": 0},
+    {"wallet": "6pT9nV2kX5cB8dG1fH4jL7mQ0aR3eY6uI9oS2wZ5tP8", "score": 20, "amount": 0}
+  ]
+}

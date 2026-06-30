@@ -27,6 +27,10 @@ use halo2_proofs::{
 };
 
 use crate::poseidon::{params, perm_native, perm_trace};
+use base64::Engine;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use std::path::Path;
 
 const B: usize = 16;
 const OFFSET: u64 = 1 << B;
@@ -467,5 +471,104 @@ pub fn run_payout() -> Result<()> {
     };
     ensure!(rejected, "mask broken: a loser was paid");
     println!("  negative (pay a loser)    : rejected ✓");
+    Ok(())
+}
+
+// ─── end-to-end: prove a real allocation, write the web artifact ─────────────────
+
+#[derive(Deserialize)]
+struct AllocInput {
+    t: u64,
+    pot: u64,
+    rows: Vec<AllocRow>,
+}
+#[derive(Deserialize)]
+struct AllocRow {
+    wallet: String,
+    score: u64,
+    amount: u64,
+}
+#[derive(Serialize)]
+struct AllocProof {
+    scheme: String,
+    m: usize,
+    t: u64,
+    n: u64,
+    pot: u64,
+    input_c: String,
+    claim_c: String,
+    proof_hash: String,
+    proof_b64: String,
+    note: String,
+}
+
+fn fr_from_str(s: &str) -> Fr {
+    let mut b: [u8; 32] = Sha256::digest(s.as_bytes()).into();
+    b[31] &= 0x1f; // canonical < field modulus
+    pruv_circuits::circuit_params::fr_from_bytes(&b).expect("canonical fr")
+}
+
+fn fr_hex(f: Fr) -> String {
+    hex::encode(pruv_circuits::circuit_params::fr_to_bytes(f))
+}
+
+/// Read an allocation, produce the single sound allocation proof, and write
+/// allocation-proof.{json,bin} into `out` for the web app.
+pub fn run_allocation(input: &Path, out: &Path) -> Result<()> {
+    let raw = std::fs::read_to_string(input)
+        .map_err(|e| anyhow!("read {}: {e}", input.display()))?;
+    let inp: AllocInput = serde_json::from_str(&raw).map_err(|e| anyhow!("parse input: {e}"))?;
+    let m = inp.rows.len();
+    anyhow::ensure!(m > 0, "no candidate rows");
+
+    let wallets: Vec<Fr> = inp.rows.iter().map(|r| fr_from_str(&r.wallet)).collect();
+    let scores: Vec<u64> = inp.rows.iter().map(|r| r.score).collect();
+    let amounts: Vec<Fr> = inp.rows.iter().map(|r| Fr::from(r.amount)).collect();
+    let n = scores.iter().filter(|&&s| s >= inp.t).count() as u64;
+    let amt_sum: u64 = inp.rows.iter().map(|r| r.amount).sum();
+    anyhow::ensure!(amt_sum == inp.pot, "Σ amount ({amt_sum}) != pot ({})", inp.pot);
+
+    let ic = native_input_c(&wallets, &scores);
+    let cc = native_claim_c(&wallets, &amounts);
+    let pubs = [Fr::from(inp.t), Fr::from(n), Fr::from(inp.pot), ic, cc];
+
+    let circuit = PayCircuit {
+        wallets: wallets.iter().map(|w| Value::known(*w)).collect(),
+        scores: scores.iter().map(|&s| Value::known(s)).collect(),
+        amounts: amounts.iter().map(|a| Value::known(*a)).collect(),
+        t: Value::known(inp.t),
+    };
+
+    eprintln!("proving allocation: M={m} candidates, N={n} winners, pot={} …", inp.pot);
+    let proof = prove(&circuit, pubs, m)?;
+    anyhow::ensure!(verify(&proof, pubs, m)?, "self-verify failed");
+    let proof_hash: [u8; 32] = Sha256::digest(&proof).into();
+
+    let out_json = AllocProof {
+        scheme: "pruvdrop-allocation-v1 — sound Poseidon, top-N + payout (k=14)".into(),
+        m,
+        t: inp.t,
+        n,
+        pot: inp.pot,
+        input_c: fr_hex(ic),
+        claim_c: fr_hex(cc),
+        proof_hash: hex::encode(proof_hash),
+        proof_b64: base64::engine::general_purpose::STANDARD.encode(&proof),
+        note: "One sound proof: from the committed candidate set (inputC: wallet+score), \
+               exactly N pass the threshold, winners receive conserved amounts (losers 0, \
+               Σ=pot), all committed in claimC. Dev SRS over a sample allocation; production \
+               uses a real powers-of-tau + the live campaign."
+            .into(),
+    };
+    std::fs::create_dir_all(out)?;
+    std::fs::write(out.join("allocation-proof.json"), serde_json::to_vec_pretty(&out_json)?)?;
+    std::fs::write(out.join("allocation-proof.bin"), &proof)?;
+
+    println!("✓ allocation proof verified + written");
+    println!("  M={m}  N={n}  pot={}", inp.pot);
+    println!("  inputC = {}", fr_hex(ic));
+    println!("  claimC = {}", fr_hex(cc));
+    println!("  proof_hash = {}", hex::encode(proof_hash));
+    println!("  -> {}/allocation-proof.json", out.display());
     Ok(())
 }

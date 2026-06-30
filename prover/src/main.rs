@@ -63,6 +63,12 @@ struct Args {
     /// prove + verify payout: real amounts, losers 0, Σ amount = pot
     #[arg(long)]
     payout: bool,
+    /// end-to-end: prove a real allocation and write web/public/allocation-proof.{json,bin}
+    #[arg(long)]
+    allocation: bool,
+    /// allocation input for --allocation
+    #[arg(long, default_value = "../app/out/allocation-input.json")]
+    alloc_input: PathBuf,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -171,6 +177,9 @@ fn main() -> Result<()> {
     }
     if args.payout {
         return payout::run_payout();
+    }
+    if args.allocation {
+        return payout::run_allocation(&args.alloc_input, &args.out);
     }
     if args.spike {
         return topn::run_spike();
