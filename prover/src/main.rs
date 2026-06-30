@@ -27,6 +27,7 @@ mod combined;
 #[path = "merkle.rs"]
 mod zkmerkle;
 mod poseidon;
+mod selection;
 mod topn;
 
 #[derive(Parser)]
@@ -55,6 +56,9 @@ struct Args {
     /// prove + verify sound counting over a Poseidon-committed set (top-N + binding)
     #[arg(long)]
     combined: bool,
+    /// prove + verify top-N winners by identity (selection + claim commitment)
+    #[arg(long)]
+    selection: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -157,6 +161,9 @@ fn main() -> Result<()> {
     }
     if args.combined {
         return combined::run_combined();
+    }
+    if args.selection {
+        return selection::run_selection();
     }
     if args.spike {
         return topn::run_spike();

@@ -189,6 +189,12 @@ then weighted-lottery mode, then recursion for large M.
   RLC fingerprint of the earlier spike is now replaced by a real Poseidon binding. (`topn.rs`
   keeps the RLC version for reference.) Production can swap the chain for a Poseidon-Merkle root
   — the gadget exists in `merkle.rs` — for cheap on-chain inclusion.
+- **Top-N winners by identity — built.** `prover/src/selection.rs` (`--selection`) adds the
+  wallet: `inputC` commits `(wallet_i, score_i)` per candidate, `selected_i = win_i·wallet_i`
+  (a mux gate), and `claimC` commits the winner wallets. Proves the winners are *exactly* the
+  top-N, bound to identity; a wrong N and a swapped winner wallet are both rejected. Remaining
+  for a full allocation proof: real payout amounts (∝ score, Σ = pot), boundary tie-break, a
+  Merkle `claimRoot` (vs the chain), weighted-lottery mode, recursion for scale.
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we
   already commit — say exactly that, not "provably-fair-by-ZK".
 - **Prover scale.** Set-size-linear prover; very large campaigns need the chunk+recurse path.
