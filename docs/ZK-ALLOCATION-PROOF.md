@@ -192,9 +192,15 @@ then weighted-lottery mode, then recursion for large M.
 - **Top-N winners by identity — built.** `prover/src/selection.rs` (`--selection`) adds the
   wallet: `inputC` commits `(wallet_i, score_i)` per candidate, `selected_i = win_i·wallet_i`
   (a mux gate), and `claimC` commits the winner wallets. Proves the winners are *exactly* the
-  top-N, bound to identity; a wrong N and a swapped winner wallet are both rejected. Remaining
-  for a full allocation proof: real payout amounts (∝ score, Σ = pot), boundary tie-break, a
-  Merkle `claimRoot` (vs the chain), weighted-lottery mode, recursion for scale.
+  top-N, bound to identity; a wrong N and a swapped winner wallet are both rejected.
+- **Payout with conservation — built.** `prover/src/payout.rs` (`--payout`) adds real amounts:
+  a mask gate forces `amount_i·(1−win_i)=0` (losers get 0), a running sum constrains
+  `Σ amount_i = pot` (public), and `claimC` commits `(wallet_i, amount_i)` — the claim-tree
+  contents. Verified with proportional amounts `[3750,0,6250]` summing to pot; a wrong pot and
+  paying a loser are both rejected. The amount *values* are the operator's published split
+  (∝ score, re-checkable from public scores); **remaining:** enforce proportional rounding
+  in-circuit, boundary tie-break, a Merkle `claimRoot` (vs the chain), weighted-lottery mode,
+  recursion for scale, then upstream the gadgets into pruv-circuits + a real SRS + audit.
 - **Don't ship the "ZK" badge before Phase 2.** Phase 1 only proves *inclusion* in a tree we
   already commit — say exactly that, not "provably-fair-by-ZK".
 - **Prover scale.** Set-size-linear prover; very large campaigns need the chunk+recurse path.

@@ -26,6 +26,7 @@ use std::path::PathBuf;
 mod combined;
 #[path = "merkle.rs"]
 mod zkmerkle;
+mod payout;
 mod poseidon;
 mod selection;
 mod topn;
@@ -59,6 +60,9 @@ struct Args {
     /// prove + verify top-N winners by identity (selection + claim commitment)
     #[arg(long)]
     selection: bool,
+    /// prove + verify payout: real amounts, losers 0, Σ amount = pot
+    #[arg(long)]
+    payout: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -164,6 +168,9 @@ fn main() -> Result<()> {
     }
     if args.selection {
         return selection::run_selection();
+    }
+    if args.payout {
+        return payout::run_payout();
     }
     if args.spike {
         return topn::run_spike();
