@@ -23,6 +23,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+mod poseidon;
 mod topn;
 
 #[derive(Parser)]
@@ -39,6 +40,9 @@ struct Args {
     /// run the Phase-2 top-N counting spike instead of the Phase-1 inclusion proof
     #[arg(long)]
     spike: bool,
+    /// verify the native Poseidon permutation matches pruv hash_two (Step 1 of the gadget)
+    #[arg(long)]
+    poseidon_test: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -130,6 +134,9 @@ fn merkle_path(leaves: &[Fr], idx: usize) -> (Fr, Vec<Fr>, Vec<bool>) {
 fn main() -> Result<()> {
     let args = Args::parse();
 
+    if args.poseidon_test {
+        return poseidon::run_test();
+    }
     if args.spike {
         return topn::run_spike();
     }
