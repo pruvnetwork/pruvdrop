@@ -176,8 +176,12 @@ then weighted-lottery mode, then recursion for large M.
   Poseidon-128 permutation now exists in `prover/src/poseidon.rs` (`--poseidon-gadget`):
   every ARK / S-box (x⁵, degree-5 gate) / MDS step is constrained against light-poseidon's
   exact width-3 constants, it matches `hash_two`, and a wrong output is rejected (1344 B,
-  k=11). **Next:** wire it into a Merkle-root gadget (replacing the RLC fingerprint binding)
-  and upstream it into pruv-circuits to fix `merkle`/`governance`/Phase-1 at the protocol level.
+  k=11). The Poseidon gadget is chained into a **sound in-circuit Merkle inclusion** in
+  `prover/src/merkle.rs` (`--merkle-gadget`): levels linked by copy constraints, `leaf ∈ root`
+  proven, wrong leaf rejected (depth-4 demo, 1536 B, k=12). **Next:** combine it with the
+  top-N circuit (replace the RLC fingerprint with this Poseidon-Merkle `inputRoot` binding)
+  and upstream the gadget into pruv-circuits to fix `merkle`/`governance`/Phase-1 at the
+  protocol level.
 - **Phase-2 spike binding is RLC, not Merkle.** `prover/src/topn.rs` binds scores to a
   public fingerprint `C = Σ scoreᵢ·rⁱ` (soundly constrained with our own gates) because the
   Poseidon gadget above isn't sound yet. Production swaps this for the Poseidon-Merkle root.

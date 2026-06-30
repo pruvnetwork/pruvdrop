@@ -23,6 +23,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+#[path = "merkle.rs"]
+mod zkmerkle;
 mod poseidon;
 mod topn;
 
@@ -46,6 +48,9 @@ struct Args {
     /// prove + verify the in-circuit constrained Poseidon permutation (Step 2 of the gadget)
     #[arg(long)]
     poseidon_gadget: bool,
+    /// prove + verify sound in-circuit Merkle inclusion (Poseidon chain)
+    #[arg(long)]
+    merkle_gadget: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -142,6 +147,9 @@ fn main() -> Result<()> {
     }
     if args.poseidon_gadget {
         return poseidon::run_gadget_test();
+    }
+    if args.merkle_gadget {
+        return zkmerkle::run_merkle_test();
     }
     if args.spike {
         return topn::run_spike();
