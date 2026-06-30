@@ -198,8 +198,8 @@ then weighted-lottery mode, then recursion for large M.
   `Σ amount_i = pot` (public), and `claimC` commits `(wallet_i, amount_i)` — the claim-tree
   contents. Verified with proportional amounts `[3750,0,6250]` summing to pot; a wrong pot and
   paying a loser are both rejected. The amount *values* are the operator's published split
-  (∝ score, re-checkable from public scores); **remaining:** weighted-lottery mode, recursion
-  for scale, then upstream the gadgets into pruv-circuits + a real SRS + audit.
+  (∝ score, re-checkable from public scores); **remaining:** recursion for scale, then upstream
+  the gadgets into pruv-circuits + a real SRS + audit.
 - **Proportional payout — proven.** `prover/src/proportional.rs` (`--proportional`) makes the
   amounts provably correct, not trusted: for each winner it proves `pot·score_i = amount_i·S +
   rem_i` with `0 ≤ rem_i < S` and `amount_i` range-bounded (so `amount_i = ⌊pot·score_i/S⌋` over
@@ -211,6 +211,13 @@ then weighted-lottery mode, then recursion for large M.
   children copy-linked) and binds the top to the public `claimRoot`; a wrong root is rejected.
   A Merkle root (not the chain) lets the on-chain claim program verify each recipient with an
   O(log M) Poseidon path — the bridge to Phase-3 on-chain gating.
+- **Weighted-lottery (anti-whale) — built.** `prover/src/lottery.rs` (`--lottery`) gives each
+  candidate a cumulative-weight bucket `[prefix[j], prefix[j]+score[j])` whose width is its
+  score, and proves each public draw `r_k` lands in exactly one bucket
+  (`Σ_j [prefix[j] ≤ r_k < prefix[j]+score[j]] = 1`, prefix sums constrained). So selection
+  probability ∝ score and a small account can still win — an alternative to top-N. Draws are
+  public here; in production `r_k = Poseidon(seed,k) mod S` over a commit-before-reveal slot
+  hash (the bounded-mod reduction is the documented add-on). A wrong S is rejected.
 - **Boundary tie-break — built.** `prover/src/tiebreak.rs` (`--tiebreak`) orders candidates by
   `(score desc, index asc)`: `win_i = [score_i>t_s] OR ([score_i==t_s] AND [i≤t_idx])`, using an
   is-zero gadget for the equality and a small index comparator for the tie. Picks exactly N

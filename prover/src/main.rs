@@ -25,6 +25,7 @@ use std::path::PathBuf;
 
 mod claimtree;
 mod combined;
+mod lottery;
 #[path = "merkle.rs"]
 mod zkmerkle;
 mod payout;
@@ -81,6 +82,9 @@ struct Args {
     /// prove + verify the Poseidon-Merkle claim root (vs the chain)
     #[arg(long)]
     claimtree: bool,
+    /// prove + verify weighted-lottery (anti-whale) bucket selection
+    #[arg(long)]
+    lottery: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -201,6 +205,9 @@ fn main() -> Result<()> {
     }
     if args.claimtree {
         return claimtree::run_claimtree();
+    }
+    if args.lottery {
+        return lottery::run_lottery();
     }
     if args.spike {
         return topn::run_spike();
