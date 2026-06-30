@@ -198,6 +198,14 @@ input:focus { outline: none; border-color: var(--accent); }
 }
 .theme-toggle:hover { filter: none; border-color: var(--accent-2); }
 
+/* header social icons (GitHub / X) */
+.hdr-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+}
+.hdr-icon:hover { color: var(--fg); border-color: var(--accent-2); }
+
 /* leaderboard */
 .lb { width: 100%; border-collapse: collapse; }
 .lb th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 700; padding: 0 8px 10px; }
