@@ -1,0 +1,23 @@
+{
+  "name": "pruvdrop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Verifiable viral airdrop on Solana — Farcaster-first, allocated by PRUV.",
+  "scripts": {
+    "test:program": "anchor test --skip-local-validator",
+    "build:program": "anchor build -p viral_airdrop_claim"
+  },
+  "devDependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/web3.js": "^1.98.0",
+    "@solana/spl-token": "^0.4.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "chai": "^4.3.10",
+    "mocha": "^10.0.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "programId": "3oCMjxiXMorGrFUrFqYUmpfwG1FMLaLBWJBh6pVRcLqJ",
+  "rpcUrl": "https://api.devnet.solana.com",
+  "mint": "REPLACE_WITH_TOKEN_MINT",
+  "claimRoot": "REPLACE_WITH_CLAIM_MERKLE_ROOT_HEX"
+}

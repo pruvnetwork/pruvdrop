@@ -1,0 +1,28 @@
+{
+  "name": "pruvdrop-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Farcaster-first verifiable viral airdrop — ingestion, scoring, snapshot, allocation, claim tree, portal.",
+  "scripts": {
+    "campaign": "tsx src/run-campaign.ts",
+    "allocate": "tsx src/run-allocate.ts",
+    "claimtree": "tsx src/run-claimtree.ts",
+    "portal": "tsx src/run-portal.ts",
+    "demo": "tsx src/demo-full.ts",
+    "selftest": "tsx src/selftest.ts",
+    "selftest:alloc": "tsx src/selftest-allocate.ts",
+    "selftest:claim": "tsx src/selftest-claim.ts"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/web3.js": "^1.98.0",
+    "@solana/spl-token": "^0.4.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

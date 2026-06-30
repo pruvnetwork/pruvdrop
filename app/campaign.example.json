@@ -1,0 +1,11 @@
+{
+  "query": "$PRUV",
+  "windowStart": 1782000000,
+  "windowEnd": 1782604800,
+  "minQualityScore": 0.5,
+  "minFollowers": 25,
+  "weights": { "like": 1, "recast": 3, "reply": 2 },
+  "reachExponent": 0.3,
+  "perAuthorCap": 0,
+  "maxCasts": 5000
+}

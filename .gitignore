@@ -1,0 +1,25 @@
+# rust / anchor
+/target
+**/target
+.anchor
+test-ledger
+
+# node
+node_modules
+app/node_modules
+dist
+app/dist
+
+# runtime output
+app/out
+out
+
+# secrets — never commit
+.env
+*.env
+!*.env.example
+**/*-keypair.json
+id.json
+
+# misc
+.DS_Store

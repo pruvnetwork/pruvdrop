@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verifiable Airdrop — Claim</title>
+<style>
+  :root { --bg:#0b0e14; --card:#121722; --line:#222a39; --fg:#e6e9ef; --muted:#8b95a7; --accent:#5b8cff; --good:#36d399; --bad:#ff5b6e; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; background:var(--bg); color:var(--fg);
+         font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { width:100%; max-width:460px; background:var(--card); border:1px solid var(--line);
+          border-radius:16px; padding:28px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:22px; }
+  button { width:100%; border:0; border-radius:10px; padding:13px; font-size:15px; font-weight:600;
+           background:var(--accent); color:#fff; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  button.secondary { background:#1b2233; color:var(--fg); border:1px solid var(--line); }
+  .row { display:flex; justify-content:space-between; padding:11px 0; border-top:1px solid var(--line); font-size:14px; }
+  .row .k { color:var(--muted); }
+  .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+  .amount { font-size:34px; font-weight:700; margin:8px 0 2px; }
+  .pill { display:inline-block; font-size:11px; padding:3px 9px; border-radius:999px; background:#1b2233; color:var(--muted); }
+  #status { margin-top:16px; font-size:13px; min-height:18px; }
+  .good { color:var(--good); } .bad { color:var(--bad); } .muted { color:var(--muted); }
+  a { color:var(--accent); text-decoration:none; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Verifiable Airdrop</h1>
+    <div class="sub">Connect the wallet that holds your award. Payout is proven on-chain against a publicly committed Merkle root — no insider list.</div>
+
+    <button id="connectBtn">Connect Wallet</button>
+
+    <div id="claimView" class="hidden">
+      <div class="pill" id="walletPill"></div>
+      <div class="amount" id="amount">—</div>
+      <div class="muted" style="font-size:12px;margin-bottom:14px">claimable to your wallet</div>
+      <div class="row"><span class="k">Index</span><span class="mono" id="idx"></span></div>
+      <div class="row"><span class="k">Proof depth</span><span class="mono" id="depth"></span></div>
+      <button id="claimBtn" style="margin-top:18px">Claim</button>
+    </div>
+
+    <div id="noClaim" class="hidden" style="margin-top:18px">
+      <div class="bad">No award found for this wallet.</div>
+      <button class="secondary" id="disconnectBtn" style="margin-top:14px">Use another wallet</button>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+<script type="module">
+import {
+  Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram,
+} from "https://esm.sh/@solana/web3.js@1.98.0";
+
+const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+const CLAIM_DISC = new Uint8Array([62, 198, 214, 193, 213, 159, 108, 210]);
+const enc = new TextEncoder();
+
+const $ = (id) => document.getElementById(id);
+const setStatus = (msg, cls="") => { const s=$("status"); s.textContent=msg; s.className=cls; };
+
+function hexToBytes(h){ const a=new Uint8Array(h.length/2); for(let i=0;i<a.length;i++) a[i]=parseInt(h.substr(i*2,2),16); return a; }
+function u64LE(v){ const b=new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, BigInt(v), true); return b; }
+function u32LE(v){ const b=new Uint8Array(4); new DataView(b.buffer).setUint32(0, v>>>0, true); return b; }
+function cat(...arrs){ let n=0; for(const a of arrs) n+=a.length; const out=new Uint8Array(n); let o=0; for(const a of arrs){ out.set(a,o); o+=a.length; } return out; }
+function pda(seeds, programId){ return PublicKey.findProgramAddressSync(seeds, programId)[0]; }
+
+let cfg, claims, provider, wallet, conn, myClaim;
+
+async function loadData(){
+  cfg = await (await fetch("config.json")).json();
+  claims = await (await fetch("claims.json")).json();
+  conn = new Connection(cfg.rpcUrl, "confirmed");
+}
+
+function ataFor(owner, mint){
+  return pda([owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()], ASSOCIATED_TOKEN_PROGRAM_ID);
+}
+
+function createAtaIdempotentIx(payer, ata, owner, mint){
+  return new TransactionInstruction({
+    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+    keys: [
+      { pubkey: payer, isSigner:true, isWritable:true },
+      { pubkey: ata, isSigner:false, isWritable:true },
+      { pubkey: owner, isSigner:false, isWritable:false },
+      { pubkey: mint, isSigner:false, isWritable:false },
+      { pubkey: SystemProgram.programId, isSigner:false, isWritable:false },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner:false, isWritable:false },
+    ],
+    data: new Uint8Array([1]), // CreateIdempotent
+  });
+}
+
+function claimIx(programId, mint, root, claim, claimant){
+  const distributor = pda([enc.encode("distributor"), hexToBytes(root)], programId);
+  const vault = pda([enc.encode("vault"), distributor.toBuffer()], programId);
+  const claimantToken = ataFor(claimant, mint);
+  const claimStatus = pda([enc.encode("claim"), distributor.toBuffer(), u64LE(claim.index)], programId);
+  const proofBytes = claim.proof.map(hexToBytes);
+  const data = cat(CLAIM_DISC, u64LE(claim.index), u64LE(BigInt(claim.amount)), u32LE(proofBytes.length), ...proofBytes);
+  return { ix: new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: claimant, isSigner:true, isWritable:true },
+      { pubkey: distributor, isSigner:false, isWritable:true },
+      { pubkey: vault, isSigner:false, isWritable:true },
+      { pubkey: claimantToken, isSigner:false, isWritable:true },
+      { pubkey: claimStatus, isSigner:false, isWritable:true },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner:false, isWritable:false },
+      { pubkey: SystemProgram.programId, isSigner:false, isWritable:false },
+    ],
+    data,
+  }), claimantToken };
+}
+
+async function connect(){
+  provider = window.solana;
+  if (!provider || !provider.isPhantom){ setStatus("Phantom wallet not found. Install it to claim.", "bad"); return; }
+  const resp = await provider.connect();
+  wallet = new PublicKey(resp.publicKey.toString());
+  showClaim();
+}
+
+function showClaim(){
+  $("connectBtn").classList.add("hidden");
+  const key = wallet.toBase58();
+  myClaim = claims[key];
+  $("walletPill").textContent = key.slice(0,4)+"…"+key.slice(-4);
+  if (!myClaim){ $("noClaim").classList.remove("hidden"); return; }
+  $("claimView").classList.remove("hidden");
+  const mint = new PublicKey(cfg.mint);
+  $("amount").textContent = formatAmount(myClaim.amount);
+  $("idx").textContent = myClaim.index;
+  $("depth").textContent = myClaim.proof.length;
+}
+
+function formatAmount(raw){ return raw; } // base units; format with decimals if desired
+
+async function doClaim(){
+  try{
+    $("claimBtn").disabled = true;
+    setStatus("Building transaction…", "muted");
+    const programId = new PublicKey(cfg.programId);
+    const mint = new PublicKey(cfg.mint);
+    const ata = ataFor(wallet, mint);
+    const { ix } = claimIx(programId, mint, cfg.claimRoot, myClaim, wallet);
+
+    const tx = new Transaction();
+    tx.add(createAtaIdempotentIx(wallet, ata, wallet, mint));
+    tx.add(ix);
+    tx.feePayer = wallet;
+    tx.recentBlockhash = (await conn.getLatestBlockhash()).blockhash;
+
+    setStatus("Approve in your wallet…", "muted");
+    const { signature } = await provider.signAndSendTransaction(tx);
+    setStatus("Confirming…", "muted");
+    await conn.confirmTransaction(signature, "confirmed");
+
+    const cluster = cfg.rpcUrl.includes("devnet") ? "?cluster=devnet" : "";
+    $("status").innerHTML = `<span class="good">Claimed.</span> <a href="https://explorer.solana.com/tx/${signature}${cluster}" target="_blank">View transaction →</a>`;
+    $("claimBtn").textContent = "Claimed";
+  }catch(e){
+    const msg = (e?.message||String(e));
+    setStatus(msg.includes("already in use") || msg.includes("custom program error: 0x0")
+      ? "Already claimed for this wallet." : ("Failed: "+msg), "bad");
+    $("claimBtn").disabled = false;
+  }
+}
+
+$("connectBtn").onclick = connect;
+$("claimBtn").onclick = doClaim;
+$("disconnectBtn")?.addEventListener("click", ()=>location.reload());
+
+loadData().catch(e => setStatus("Failed to load campaign data: "+e.message, "bad"));
+</script>
+</body>
+</html>
