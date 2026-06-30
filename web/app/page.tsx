@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import Countdown from "./Countdown";
 
-interface Cfg { programId: string; rpcUrl: string; mint: string; claimRoot: string; }
+interface Cfg { programId: string; rpcUrl: string; mint: string; claimRoot: string; pot?: string; drawAt?: string; }
 
 export default function Home() {
   const [cfg, setCfg] = useState<Cfg | null>(null);
@@ -19,6 +20,13 @@ export default function Home() {
           No insider list. No free wallets. The most viral $ANSEM posts win — and the
           allocation is <b>committed on-chain before the draw</b>, so anyone can
           recompute the winners. Earned by the community, not handed to insiders.
+        </div>
+        <div className="potbar">
+          <div className="pot">
+            <span className="potval">{cfg?.pot ? `${Number(cfg.pot).toLocaleString()} $ANSEM` : "TBA"}</span>
+            <span className="potlabel">to the top viral posters</span>
+          </div>
+          <Countdown to={cfg?.drawAt ?? ""} />
         </div>
         <div className="cta">
           <a className="primary" href="/submit">Submit your tweet</a>

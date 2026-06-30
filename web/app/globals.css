@@ -122,6 +122,14 @@ input:focus { outline: none; border-color: var(--accent); }
 .center { text-align: center; }
 .back { color: var(--muted); font-size: 13px; }
 
+/* pot + countdown */
+.potbar { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 6px 0 24px; }
+.pot, .countdown { background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 24px; display: flex; flex-direction: column; align-items: center; min-width: 210px; }
+.potval { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
+.potlabel { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+.cdlabel { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+.cdval { font-size: 24px; font-weight: 800; font-family: var(--font-mono), ui-monospace, monospace; letter-spacing: -0.5px; }
+
 /* header */
 .hdr {
   position: sticky; top: 0; z-index: 40;
