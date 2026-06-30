@@ -23,6 +23,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 
+mod claimtree;
 mod combined;
 #[path = "merkle.rs"]
 mod zkmerkle;
@@ -77,6 +78,9 @@ struct Args {
     /// prove + verify proportional payout: amount = floor(pot·score/S), in-circuit
     #[arg(long)]
     proportional: bool,
+    /// prove + verify the Poseidon-Merkle claim root (vs the chain)
+    #[arg(long)]
+    claimtree: bool,
 }
 
 /// pruvdrop claim-tree shape (subset we need).
@@ -194,6 +198,9 @@ fn main() -> Result<()> {
     }
     if args.proportional {
         return proportional::run_proportional();
+    }
+    if args.claimtree {
+        return claimtree::run_claimtree();
     }
     if args.spike {
         return topn::run_spike();
