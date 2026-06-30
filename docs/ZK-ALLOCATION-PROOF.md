@@ -181,12 +181,12 @@ then weighted-lottery mode, then recursion for large M.
   proven, wrong leaf rejected (depth-4 demo, 1536 B, k=12). **Upstreamed:** the sound
   permutation now lives in the protocol repo as `pruv-circuits::poseidon_sound`
   (`circuits/tests/test_poseidon_sound.rs` passes: native == `hash_two`, prove/verify binds the
-  output, a wrong output is rejected). **Wired:** pruv's `merkle` and `governance` circuits now
-  hash each path level with the full constrained permutation (a reusable `merkle::assign_sound_path`;
-  the merkle leaf is also bound to `instance[1]`, which it wasn't before). `test_merkle` (incl.
-  `prove_verify_depth20`) and `test_governance` pass — so the pruvdrop **Phase-1 inclusion proof
-  (which calls pruv `merkle::prove`) is now sound too.** Remaining at the protocol level:
-  governance's own leaf/nullifier hashes still use the unconstrained `PoseidonChip`.
+  output, a wrong output is rejected). It is **additive / opt-in** — committed to pruv-circuits
+  without touching the existing circuits. A prototype that wires it into `merkle` + `governance`
+  was built and tested (`test_merkle`/`test_governance` passed) but **deliberately not kept**:
+  rewriting those core circuits changes their verification keys and invalidates existing proofs,
+  so that adoption is left to the PRUV team. **Therefore `merkle`/`governance` and the pruvdrop
+  Phase-1 inclusion proof remain honest-prover-only until the team wires `poseidon_sound` in.**
 - **Sound counting over a committed set — built.** `prover/src/combined.rs` (`--combined`)
   binds the scores to a sound **Poseidon-chain** commitment `C` (each step the constrained
   permutation, score cells shared with the comparator by copy constraints) and proves exactly
