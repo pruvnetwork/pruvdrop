@@ -166,11 +166,15 @@ npm run campaign:x -- ./tweets.json ./campaign-x.json           # X (wallet-in-t
 npm run allocate                                                # -> out/allocation.json
 npm run claimtree                                               # -> out/claims.json
 
-# 3. publish to the web app (config + claims + leaderboard)
+# 3. publish to the web app (config + claims + leaderboard + ZK allocation input)
 MINT=<token-mint> RPC=<rpc> npm run build-campaign              # -> web/public/{config,claims,leaderboard}.json
+#    also writes out/allocation-input.json  (MAX_CANDIDATES=N caps M for a single proof)
 #    (refresh the leaderboard any time during the campaign: npm run leaderboard)
 
-# 4. commit web/public + redeploy (Vercel)
+# 4. (optional) one sound ZK allocation proof -> web/public/allocation-proof.json, shown on /verify
+cd ../prover && cargo run --release -- --allocation             # needs a side-by-side pruv checkout
+
+# 5. commit web/public + redeploy (Vercel)
 ```
 
 ### Collecting tweet submissions
