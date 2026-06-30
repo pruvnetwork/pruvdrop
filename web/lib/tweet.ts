@@ -1,4 +1,4 @@
-// Shared tweet validation (server-side; the syndication endpoint blocks browser CORS).
+// Shared tweet validation + metadata (server-side; syndication blocks browser CORS).
 
 const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 function base58Len(s: string): number {
@@ -27,6 +27,19 @@ function token(id: string): string {
 }
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
+async function fetchRaw(id: string): Promise<any | null> {
+  try {
+    const r = await fetch(
+      `https://cdn.syndication.twimg.com/tweet-result?id=${id}&token=${token(id)}&lang=en`,
+      { headers: { "User-Agent": UA, accept: "application/json" }, next: { revalidate: 120 } } as any
+    );
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
 export interface Verdict {
   ok: boolean;
   reason: "ok" | "bad_url" | "not_found" | "no_ticker" | "no_wallet";
@@ -36,13 +49,8 @@ export interface Verdict {
 export async function validateTweet(ref: string, ticker: string): Promise<Verdict> {
   const id = parseTweetId(ref);
   if (!id) return { ok: false, reason: "bad_url" };
-  let t: any;
-  try {
-    const r = await fetch(`https://cdn.syndication.twimg.com/tweet-result?id=${id}&token=${token(id)}&lang=en`,
-      { headers: { "User-Agent": UA, accept: "application/json" } });
-    if (!r.ok) return { ok: false, reason: "not_found" };
-    t = await r.json();
-  } catch { return { ok: false, reason: "not_found" }; }
+  const t = await fetchRaw(id);
+  if (!t) return { ok: false, reason: "not_found" };
 
   const text: string = t.text || t.full_text || "";
   const handle: string = (t.user && t.user.screen_name) || "";
@@ -51,4 +59,11 @@ export async function validateTweet(ref: string, ticker: string): Promise<Verdic
   const wallet = extractSolanaAddress(text);
   if (!wallet) return { ok: false, reason: "no_wallet", handle, likes };
   return { ok: true, reason: "ok", id, handle, likes, wallet };
+}
+
+/** Current engagement for a tweet (for the live leaderboard). */
+export async function fetchTweetMeta(id: string): Promise<{ handle: string; likes: number } | null> {
+  const t = await fetchRaw(id);
+  if (!t) return null;
+  return { handle: (t.user && t.user.screen_name) || "", likes: t.favorite_count || 0 };
 }

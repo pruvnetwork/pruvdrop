@@ -5,21 +5,36 @@ interface Row { handle: string; posts: number; likes: number; score: number; }
 
 export default function Leaderboard() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [source, setSource] = useState<"submissions" | "farcaster">("farcaster");
   const [err, setErr] = useState(false);
 
   useEffect(() => {
-    fetch("/leaderboard.json").then((r) => r.json()).then(setRows).catch(() => setErr(true));
+    (async () => {
+      try {
+        const live = await fetch("/api/leaderboard").then((r) => r.json());
+        if (live?.source === "submissions" && live.rows?.length) {
+          setRows(live.rows); setSource("submissions"); return;
+        }
+      } catch {}
+      // fallback: static Farcaster standings
+      try {
+        const fc = await fetch("/leaderboard.json").then((r) => r.json());
+        setRows(fc); setSource("farcaster");
+      } catch { setErr(true); }
+    })();
   }, []);
+
+  const profile = (h: string) => (source === "submissions" ? `https://x.com/${h}` : `https://warpcast.com/${h}`);
 
   return (
     <div className="page">
       <a className="back" href="/">← back</a>
       <div className="hero" style={{ paddingTop: 18 }}>
-        <span className="pill">$ANSEM · Farcaster · live</span>
+        <span className="pill">$ANSEM · {source === "submissions" ? "X" : "Farcaster"} · live</span>
         <h1>Leaderboard</h1>
         <div className="lead">
-          The most viral Farcaster posts mentioning $ANSEM, ranked. Final winners are
-          <b> committed on-chain before the draw</b> — climb by posting, verify the result yourself.
+          The most viral {source === "submissions" ? "submitted" : "Farcaster"} posts mentioning $ANSEM, ranked.
+          Final winners are <b>committed on-chain before the draw</b> — climb by posting, verify the result yourself.
         </div>
       </div>
 
@@ -27,6 +42,8 @@ export default function Leaderboard() {
         <div className="panel">
           {err ? (
             <div className="status bad">Could not load standings.</div>
+          ) : rows.length === 0 ? (
+            <div className="status muted">No entries yet — be the first. <a href="/submit">Submit your tweet →</a></div>
           ) : (
             <table className="lb">
               <thead>
@@ -42,7 +59,7 @@ export default function Leaderboard() {
                 {rows.map((r, i) => (
                   <tr key={r.handle} className={i < 3 ? `top${i + 1}` : ""}>
                     <td className="rank num">{i + 1}</td>
-                    <td className="who"><a href={`https://warpcast.com/${r.handle}`} target="_blank">@{r.handle}</a></td>
+                    <td className="who"><a href={profile(r.handle)} target="_blank">@{r.handle}</a></td>
                     <td className="num">{r.posts}</td>
                     <td className="num">{r.likes.toLocaleString()}</td>
                     <td className="num score">{r.score.toFixed(1)}</td>
