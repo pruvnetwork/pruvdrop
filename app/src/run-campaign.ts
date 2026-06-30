@@ -36,10 +36,11 @@ async function main() {
   console.log(`      pulled ${casts.length} casts in window`);
 
   console.log("[2/3] Scoring + filtering...");
-  const { candidates, stats } = scoreAndAggregate(casts, cfg);
+  const { candidates, pending, stats } = scoreAndAggregate(casts, cfg);
   console.log(`      gates: ${stats.afterGates}/${stats.rawCasts} casts passed`);
-  console.log(`      dropped — no wallet: ${stats.droppedNoWallet}, quality: ${stats.droppedQuality}, followers: ${stats.droppedFollowers}`);
-  console.log(`      unique eligible authors: ${stats.uniqueAuthors}`);
+  console.log(`      dropped — quality: ${stats.droppedQuality}, followers: ${stats.droppedFollowers}`);
+  console.log(`      eligible authors (Solana wallet): ${stats.uniqueAuthors}`);
+  console.log(`      pending authors (no Solana wallet, verify to qualify): ${stats.pendingAuthors}`);
 
   console.log("[3/3] Building canonical snapshot + Merkle root...");
   const snapshot = buildSnapshot(candidates, cfg);
@@ -47,6 +48,7 @@ async function main() {
   mkdirSync("out", { recursive: true });
   writeFileSync("out/candidates.json", JSON.stringify(candidates, null, 2));
   writeFileSync("out/snapshot.json", JSON.stringify(snapshot, null, 2));
+  writeFileSync("out/pending.json", JSON.stringify(pending, null, 2));
 
   const top = [...candidates].sort((a, b) => b.score - a.score).slice(0, 10);
   console.log(`\nMerkle root: ${snapshot.merkleRoot}`);
@@ -55,8 +57,17 @@ async function main() {
   for (const [i, c] of top.entries()) {
     console.log(`  ${String(i + 1).padStart(2)}. @${c.username} (fid ${c.fid})  score=${c.score.toFixed(3)}  L/R/Re=${c.totalLikes}/${c.totalRecasts}/${c.totalReplies}`);
   }
-  console.log(`\nWrote out/candidates.json and out/snapshot.json`);
-  console.log("Next: commit snapshot.merkleRoot on-chain (PRUV), then run allocation (Layer 3).\n");
+  if (pending.length > 0) {
+    const tp = pending.slice(0, 5);
+    console.log(`\nVerify-to-qualify — ${pending.length} casters are otherwise eligible but have no Solana wallet.`);
+    console.log("Notify them to verify a Solana address on Farcaster before the snapshot is finalized:");
+    for (const p of tp) console.log(`  @${p.username} (fid ${p.fid})  score=${p.score.toFixed(3)}`);
+    console.log("  -> out/pending.json (full list)");
+  }
+
+  console.log(`\nWrote out/candidates.json, out/snapshot.json, out/pending.json`);
+  console.log("Next: open a grace window (notify pending casters), re-run to pick up newly-verified");
+  console.log("wallets, then commit snapshot.merkleRoot on-chain (PRUV) and run allocation.\n");
 }
 
 main().catch((e) => {

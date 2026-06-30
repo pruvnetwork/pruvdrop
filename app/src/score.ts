@@ -4,9 +4,26 @@
  * Aggregates qualifying casts per author into a single Candidate with a
  * dampened virality score. Eligibility gates run first; whales and swarms
  * are limited by reach-normalization and an optional per-author cap.
+ *
+ * Verify-to-qualify grace window: casters who pass the quality + follower
+ * gates but have NO Solana verified address are NOT discarded — they are
+ * collected as `pending` so the campaign can tell them "verify your Solana
+ * wallet on Farcaster to qualify" before the snapshot is finalized.
  */
 
 import type { CampaignConfig, Candidate, RawCast } from "./types.js";
+
+/** Otherwise-eligible caster who lacks a Solana verified address. */
+export interface PendingCaster {
+  fid: number;
+  username: string;
+  score: number;
+  castCount: number;
+  totalLikes: number;
+  totalRecasts: number;
+  totalReplies: number;
+  qualityScore: number | null;
+}
 
 function castEngagementScore(c: RawCast, cfg: CampaignConfig): number {
   const raw =
@@ -18,24 +35,15 @@ function castEngagementScore(c: RawCast, cfg: CampaignConfig): number {
   return raw / denom;
 }
 
-function passesGates(c: RawCast, cfg: CampaignConfig): boolean {
-  if (!c.solWallet) return false; // must have a verified Solana address to receive
-  if (c.followerCount < cfg.minFollowers) return false;
-  if (cfg.minQualityScore > 0) {
-    // If quality is unknown, fail closed when a threshold is set.
-    if (c.qualityScore === null) return false;
-    if (c.qualityScore < cfg.minQualityScore) return false;
-  }
-  return true;
-}
-
 export interface ScoreResult {
   candidates: Candidate[];
+  /** Pass quality + followers but missing a Solana wallet — verify to qualify. */
+  pending: PendingCaster[];
   stats: {
     rawCasts: number;
     afterGates: number;
     uniqueAuthors: number;
-    droppedNoWallet: number;
+    pendingAuthors: number;
     droppedQuality: number;
     droppedFollowers: number;
   };
@@ -46,55 +54,66 @@ export function scoreAndAggregate(casts: RawCast[], cfg: CampaignConfig): ScoreR
     rawCasts: casts.length,
     afterGates: 0,
     uniqueAuthors: 0,
-    droppedNoWallet: 0,
+    pendingAuthors: 0,
     droppedQuality: 0,
     droppedFollowers: 0,
   };
 
   const byFid = new Map<number, Candidate>();
+  const pendingByFid = new Map<number, PendingCaster>();
 
   for (const c of casts) {
-    if (!c.solWallet) { stats.droppedNoWallet++; continue; }
+    // Real eligibility gates first (these are genuine disqualifications).
     if (c.followerCount < cfg.minFollowers) { stats.droppedFollowers++; continue; }
     if (cfg.minQualityScore > 0 && (c.qualityScore === null || c.qualityScore < cfg.minQualityScore)) {
       stats.droppedQuality++; continue;
     }
-    if (!passesGates(c, cfg)) continue;
 
     stats.afterGates++;
     const inc = castEngagementScore(c, cfg);
+
+    if (!c.solWallet) {
+      // Verify-to-qualify: otherwise eligible, just no Solana address yet.
+      const ex = pendingByFid.get(c.fid);
+      if (ex) {
+        ex.score += inc; ex.castCount += 1;
+        ex.totalLikes += c.likes; ex.totalRecasts += c.recasts; ex.totalReplies += c.replies;
+      } else {
+        pendingByFid.set(c.fid, {
+          fid: c.fid, username: c.username, score: inc, castCount: 1,
+          totalLikes: c.likes, totalRecasts: c.recasts, totalReplies: c.replies,
+          qualityScore: c.qualityScore,
+        });
+      }
+      continue;
+    }
+
+    // Eligible candidate (has a Solana verified address).
     const existing = byFid.get(c.fid);
     if (existing) {
-      existing.score += inc;
-      existing.castCount += 1;
-      existing.totalLikes += c.likes;
-      existing.totalRecasts += c.recasts;
-      existing.totalReplies += c.replies;
+      existing.score += inc; existing.castCount += 1;
+      existing.totalLikes += c.likes; existing.totalRecasts += c.recasts; existing.totalReplies += c.replies;
     } else {
       byFid.set(c.fid, {
-        fid: c.fid,
-        username: c.username,
-        wallet: c.solWallet!,
-        score: inc,
-        castCount: 1,
-        totalLikes: c.likes,
-        totalRecasts: c.recasts,
-        totalReplies: c.replies,
-        qualityScore: c.qualityScore,
+        fid: c.fid, username: c.username, wallet: c.solWallet, score: inc, castCount: 1,
+        totalLikes: c.likes, totalRecasts: c.recasts, totalReplies: c.replies, qualityScore: c.qualityScore,
       });
     }
   }
 
   let candidates = [...byFid.values()];
+  let pending = [...pendingByFid.values()];
 
   // Per-author cap (anti-whale): clamp score to the cap if set.
   if (cfg.perAuthorCap > 0) {
-    for (const cand of candidates) cand.score = Math.min(cand.score, cfg.perAuthorCap);
+    for (const x of candidates) x.score = Math.min(x.score, cfg.perAuthorCap);
+    for (const x of pending) x.score = Math.min(x.score, cfg.perAuthorCap);
   }
 
-  // Drop zero-score entries.
   candidates = candidates.filter((c) => c.score > 0);
+  pending = pending.filter((c) => c.score > 0).sort((a, b) => b.score - a.score);
 
   stats.uniqueAuthors = candidates.length;
-  return { candidates, stats };
+  stats.pendingAuthors = pending.length;
+  return { candidates, pending, stats };
 }

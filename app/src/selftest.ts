@@ -32,14 +32,17 @@ const casts: RawCast[] = [
   cast({ fid: 10, username: "alice", solWallet: "AAAA", likes: 100, recasts: 20, replies: 10, followerCount: 500, qualityScore: 0.9 }),
   cast({ fid: 10, username: "alice", solWallet: "AAAA", likes: 50, recasts: 5, replies: 2, followerCount: 500, qualityScore: 0.9 }), // same author, aggregates
   cast({ fid: 20, username: "bob", solWallet: "BBBB", likes: 5, recasts: 1, replies: 0, followerCount: 50, qualityScore: 0.8 }),
-  cast({ fid: 30, username: "nowallet", solWallet: null, likes: 999, recasts: 999, replies: 999, followerCount: 9000, qualityScore: 0.99 }), // dropped: no wallet
+  cast({ fid: 30, username: "nowallet", solWallet: null, likes: 999, recasts: 999, replies: 999, followerCount: 9000, qualityScore: 0.99 }), // pending: verify to qualify
   cast({ fid: 40, username: "lowq", solWallet: "DDDD", likes: 999, recasts: 999, replies: 999, followerCount: 9000, qualityScore: 0.2 }),  // dropped: quality
   cast({ fid: 50, username: "lowfoll", solWallet: "EEEE", likes: 999, recasts: 999, replies: 999, followerCount: 3, qualityScore: 0.9 }),  // dropped: followers
 ];
 
-const { candidates, stats } = scoreAndAggregate(casts, cfg);
+const { candidates, pending, stats } = scoreAndAggregate(casts, cfg);
 
-assert(stats.droppedNoWallet === 1, `no-wallet drop (got ${stats.droppedNoWallet})`);
+assert(stats.pendingAuthors === 1, `pending (no wallet) (got ${stats.pendingAuthors})`);
+assert(pending[0].fid === 30, "pending caster is fid 30 (verify to qualify)");
+assert(pending[0].score > 0, "pending caster has a score");
+assert(candidates.every((c) => c.fid !== 30), "pending caster is NOT in candidates");
 assert(stats.droppedQuality === 1, `quality drop (got ${stats.droppedQuality})`);
 assert(stats.droppedFollowers === 1, `followers drop (got ${stats.droppedFollowers})`);
 assert(stats.uniqueAuthors === 2, `unique authors (got ${stats.uniqueAuthors})`);

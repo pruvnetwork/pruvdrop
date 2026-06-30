@@ -80,10 +80,24 @@ cargo update -p blake3 --precise 1.5.5
 
 The committed `Cargo.lock` already pins this.
 
-## Eligibility (Option A)
+## Eligibility — verify-to-qualify grace window
 
-Only casters with a **Solana verified address** on their Farcaster profile are
-eligible (no claim-time wallet linking). Communicate this in the campaign:
+Only casters with a **Solana verified address** on their Farcaster profile can
+receive (no claim-time wallet linking — keeps the on-chain model trustless).
+
+To avoid silently excluding the ~30% of casters who are otherwise eligible but
+have no Solana address, the ingest does **not** drop them — it collects them into
+`out/pending.json` ("verify to qualify"):
+
+```
+[1] run-campaign  ->  eligible (have Solana wallet)  +  pending (no wallet yet)
+[2] open a grace window: notify pending casters to verify a Solana address on Farcaster
+[3] re-run run-campaign  ->  newly-verified wallets move from pending -> eligible
+[4] finalize: commit snapshot.merkleRoot + allocate
+```
+
+This turns the exclusion into an opt-in and nudges casters to verify a Solana
+wallet (an ecosystem win). Communicate it in the campaign:
 *"verify your Solana wallet on Farcaster to qualify."*
 
 ## Fairness
